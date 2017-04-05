@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\DXDevice">
+      <UniqueIdentifier>{59fa1d85-4054-4b86-8c7b-83f1ec38966a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\DXDevice">
+      <UniqueIdentifier>{3a43ad4c-76ee-466e-ae14-96fc9c6cbbc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Math">
+      <UniqueIdentifier>{01e2c489-507a-4b82-a939-ba6f37ba7730}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Math">
+      <UniqueIdentifier>{82944e0b-4f06-440e-aab7-0de68ed26d8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\AppMain">
+      <UniqueIdentifier>{19a2c2ec-cbef-40da-bdf9-26d1b4a6c872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Appmain">
+      <UniqueIdentifier>{19e28677-31b1-451e-9795-67c4351f20e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Scene">
+      <UniqueIdentifier>{c0d4e043-d215-46d1-ad24-6b3c7d914f49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Scene">
+      <UniqueIdentifier>{e5b524b6-d143-4f5d-9ef0-0587d0bef37b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Utilities">
+      <UniqueIdentifier>{93c4cede-7afd-47cf-ab01-aa8027df0a2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Utilities">
+      <UniqueIdentifier>{aacad110-da8f-4b54-9009-27b7eecd2e0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Graphics">
+      <UniqueIdentifier>{8e45b0f3-1859-4036-a9fb-5233e771fbcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Graphics">
+      <UniqueIdentifier>{464d3ebf-e980-4c1a-905f-392910796e53}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DXDevice\DXResources.h">
+      <Filter>头文件\DXDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MathHelper.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="DXDevice\DirectXHelper.h">
+      <Filter>头文件\DXDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="AppMain\AppMain.h">
+      <Filter>头文件\AppMain</Filter>
+    </ClInclude>
+    <ClInclude Include="AppMain\AppResources.h">
+      <Filter>头文件\AppMain</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneBase.h">
+      <Filter>头文件\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\StepTimer.h">
+      <Filter>头文件\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\ShaderStructure.h">
+      <Filter>头文件\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="AppMain\WindowCreator.h">
+      <Filter>头文件\AppMain</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\SdmCamera.h">
+      <Filter>头文件\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\SphereGen.h">
+      <Filter>头文件\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\AssetHelper.h">
+      <Filter>头文件\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\BufMesh.h">
+      <Filter>头文件\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DataBuf.h">
+      <Filter>头文件\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Hash.h">
+      <Filter>头文件\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\ShaderLoader.h">
+      <Filter>头文件\Utilities</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DXDevice\DXResources.cpp">
+      <Filter>源文件\DXDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="AppMain\AppMain.cpp">
+      <Filter>源文件\Appmain</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\StepTimer.cpp">
+      <Filter>源文件\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneBase.cpp">
+      <Filter>源文件\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="AppMain\WindowCreator.cpp">
+      <Filter>源文件\Appmain</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\SdmCamera.cpp">
+      <Filter>源文件\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\SphereGen.cpp">
+      <Filter>源文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\BufMesh.cpp">
+      <Filter>源文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DataBuf.cpp">
+      <Filter>源文件\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\ShaderLoader.cpp">
+      <Filter>源文件\Utilities</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
