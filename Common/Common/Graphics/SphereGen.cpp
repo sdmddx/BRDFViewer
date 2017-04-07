@@ -268,7 +268,7 @@ unique_ptr<DataBuf> SphereGenerator::GenerateSpherePvN(SDMuint count, TriangleOr
 	return pdataBuf;
 }
 
-//生成一个PfNvN球
+//根据顶点法线生成面法线
 void SphereGenerator::AddFaceNormal(BufMesh* pMesh)
 {
 
@@ -288,13 +288,13 @@ void SphereGenerator::AddFaceNormal(BufMesh* pMesh)
 }
 
 //平面映射模式生成纹理坐标
-void SphereGenerator::CreateTexFlat(BufMesh* pMesh)
+void SphereGenerator::CreateTexFlat(BufMesh* pmesh)
 {
-	pMesh->pPositiveFaceIndexUV = new XMFLOAT2[pMesh->GetCntFace() * 3];
-	XMFLOAT2* pPFIUV = pMesh->pPositiveFaceIndexUV;
-	SDMuint3* pFace = pMesh->pFace;
-	XMFLOAT3* pVer = pMesh->pVertex;
-	for (SDMuint i = 0; i < pMesh->GetCntFace(); ++i)
+	pmesh->pPositiveFaceIndexUV = new XMFLOAT2[pmesh->GetCntFace() * 3];
+	XMFLOAT2* pPFIUV = pmesh->pPositiveFaceIndexUV;
+	SDMuint3* pFace = pmesh->pFace;
+	XMFLOAT3* pVer = pmesh->pVertex;
+	for (SDMuint i = 0; i < pmesh->GetCntFace(); ++i)
 	{
 		for (int j = 0; j < 3; ++j)
 
@@ -305,13 +305,14 @@ void SphereGenerator::CreateTexFlat(BufMesh* pMesh)
 		}
 
 	}
-	pMesh->SetCntFaceIndexPositiveUV(pMesh->GetCntFace() * 3);
+	pmesh->SetCntFaceIndexPositiveUV(pmesh->GetCntFace() * 3);
 }
 
 //生成一个纹理球
 unique_ptr<DataBuf> SphereGenerator::GenerateSpherePTvN(SDMuint count, TriangleOrder order, TexMapperFunc func)
 {
 	unique_ptr<DataBuf> pdataBuf = GenerateSpherePvN(count, order);
+	
 	CreateTexFlat(pdataBuf->GetBufMeshByIndex(0));
 	//ppTexFunc[func](pdataBuf->pCurMesh);
 	return pdataBuf;

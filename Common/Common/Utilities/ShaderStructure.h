@@ -13,13 +13,43 @@ struct CB_MVP
 	DirectX::XMFLOAT4X4 projection;
 };
 
-struct SphereSceneConstantBuffer
+struct CB_WVP
 {
 	XMFLOAT4X4 model;
 	XMFLOAT4X4 view;
 	XMFLOAT4X4 projection;
 
 
+};
+
+struct CB_WINDOWINFO
+{
+	float height;
+	float width;
+	float fovAngleY;	//视口垂直可视角度
+	float aspectRatio;	//视口宽高比
+	float nearZ;		//近平面距离
+	float farZ;			//远平面距离
+	float unused0;
+	float unused1;
+};
+
+struct CB_WVP_Inverse
+{
+	XMFLOAT4X4 view_Inverse;
+	XMFLOAT4 viewPos;
+};
+
+struct LightInfo
+{
+	XMFLOAT3 lightPos;
+	XMFLOAT3 lightColor;
+};
+
+struct LightsInfo
+{
+	UINT numLights;
+	XMFLOAT3 ambientColor;
 };
 
 struct CB_Light
@@ -61,4 +91,23 @@ struct Vertex_PosVernor
 {
 	XMFLOAT3 pos;
 	XMFLOAT3 vernor;
+};
+
+struct Vertex_PosverNorTex
+{
+	XMFLOAT3 pos;
+	XMFLOAT3 vernor;
+	XMFLOAT2 tex;
+};
+
+struct Vertex_PosTex
+{
+	XMFLOAT3 pos;
+	XMFLOAT2 tex;
+};
+
+struct Vertex_Pos
+{
+	XMFLOAT3 pos;
+
 };

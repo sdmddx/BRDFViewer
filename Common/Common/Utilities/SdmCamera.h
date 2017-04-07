@@ -33,9 +33,11 @@ namespace Utilities
 
 		SdmCamera(const XMVECTOR& eye = XMVectorSet(0.0f, 0.0f, -1.0f, 1.0f), const XMVECTOR& at = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f), const XMVECTOR& up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 
-		const XMMATRIX& getView();
+		XMMATRIX& GetView();
+		
+		XMMATRIX& GetInverseView();
 
-		XMFLOAT4& getEye();
+		XMFLOAT4& GetEye();
 
 		//镜头变换模式-----场景编辑器部分  鼠标左右键+(鼠标移动方向)+(ALT)+(鼠标滑轮)
 		void TransformModeA(float angle);	//LM+MH

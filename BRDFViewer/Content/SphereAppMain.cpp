@@ -33,6 +33,8 @@ void SphereAppMain::Update()
 	});
 }
 
+
+
 bool SphereAppMain::Render()
 {
 	// 在首次更新前，请勿尝试呈现任何内容。
@@ -40,25 +42,9 @@ bool SphereAppMain::Render()
 	{
 		return false;
 	}
-	auto context = m_dxResources->GetD3DDeviceContext();
-
-	// 将视区重置为针对整个屏幕。
-	auto viewport = m_dxResources->GetScreenViewport();
-	context->RSSetViewports(1, &viewport);
-
-	// 将呈现目标重置为屏幕。
-	ID3D11RenderTargetView *const targets[1] = { m_dxResources->GetBackBufferRenderTargetView() };
-	context->OMSetRenderTargets(1, targets, m_dxResources->GetDepthStencilView());
-
-	// 清除后台缓冲区和深度模具视图。
-	context->ClearRenderTargetView(m_dxResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
-	context->ClearDepthStencilView(m_dxResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// 呈现场景对象。
-	// TODO: 将此替换为应用程序内容的渲染函数。
-
 	m_scene->Render();
-	//m_dxResources->Present();
 	
 	return true;
 }

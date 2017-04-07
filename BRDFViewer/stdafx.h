@@ -33,6 +33,7 @@
 //#include <collection.h>
 
 #include "Content\SphereScene.h"
+#include "Content\BP_DS.h"
 #include "Content\SphereAppMain.h"
 
 

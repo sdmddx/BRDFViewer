@@ -42,33 +42,28 @@ void DXResources::CreateDeviceIndependentResources()
 #endif
 
 	// 初始化 Direct2D 工厂。
-	DX::ThrowIfFailed(
 		D2D1CreateFactory(
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory3),
 			&options,
 			&m_d2dFactory
-		)
+		
 	);
 
 	// 初始化 DirectWrite 工厂。
-	DX::ThrowIfFailed(
 		DWriteCreateFactory(
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory3),
 			&m_dwriteFactory
-		)
+		
 	);
 
 	// 初始化 Windows 图像处理组件(WIC)工厂。
-	DX::ThrowIfFailed(
 		CoCreateInstance(
 			CLSID_WICImagingFactory2,
 			nullptr,
 			CLSCTX_INPROC_SERVER,
-			IID_PPV_ARGS(&m_wicFactory)
-		)
-	);
+			IID_PPV_ARGS(&m_wicFactory)	);
 
 	
 
@@ -127,7 +122,6 @@ void DXResources::CreateDeviceResources()
 	if (FAILED(hr))
 	{
 		// 如果初始化失败，则回退到 WARP 设备。
-		DX::ThrowIfFailed(
 			D3D11CreateDevice(
 				nullptr,
 				D3D_DRIVER_TYPE_WARP, // 创建 WARP 设备而不是硬件设备。
@@ -139,35 +133,25 @@ void DXResources::CreateDeviceResources()
 				&device,
 				&m_d3dFeatureLevel,
 				&context
-			)
+			
 		);
 	}
 
 	// 将指针存储到 Direct3D 11.3 API 设备和即时上下文中。
-	DX::ThrowIfFailed(
-		device.As(&m_d3dDevice)
-	);
+	device.As(&m_d3dDevice);
 
-	DX::ThrowIfFailed(
-		context.As(&m_d3dContext)
-	);
+		context.As(&m_d3dContext);
 
 	// 创建 Direct2D 设备对象和对应的上下文。
 	ComPtr<IDXGIDevice3> dxgiDevice;
-	DX::ThrowIfFailed(
-		m_d3dDevice.As(&dxgiDevice)
-	);
+		m_d3dDevice.As(&dxgiDevice);
 
-	DX::ThrowIfFailed(
-		m_d2dFactory->CreateDevice(dxgiDevice.Get(), &m_d2dDevice)
-	);
+		m_d2dFactory->CreateDevice(dxgiDevice.Get(), &m_d2dDevice);
 
-	DX::ThrowIfFailed(
 		m_d2dDevice->CreateDeviceContext(
 			D2D1_DEVICE_CONTEXT_OPTIONS_NONE,
 			&m_d2dContext
-		)
-	);
+		);
 }
 
 // 每次更改窗口大小时需要重新创建这些资源
@@ -207,10 +191,7 @@ void DXResources::CreateWindowSizeDependentResources(Math::Size &s)
 			// 并正确设置新设备。
 			return;
 		}
-		else
-		{
-			DX::ThrowIfFailed(hr);
-		}
+		return;
 	}
 	else
 	{
@@ -232,23 +213,16 @@ void DXResources::CreateWindowSizeDependentResources(Math::Size &s)
 
 		// 此序列获取用来创建上面的 Direct3D 设备的 DXGI 工厂。
 		ComPtr<IDXGIDevice3> dxgiDevice;
-		DX::ThrowIfFailed(
-			m_d3dDevice.As(&dxgiDevice)
-		);
+			m_d3dDevice.As(&dxgiDevice);
 
 		ComPtr<IDXGIAdapter> dxgiAdapter;
-		DX::ThrowIfFailed(
-			dxgiDevice->GetAdapter(&dxgiAdapter)
-		);
+			dxgiDevice->GetAdapter(&dxgiAdapter);
 
 		ComPtr<IDXGIFactory4> dxgiFactory;
-		DX::ThrowIfFailed(
-			dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory))
-		);
+			dxgiAdapter->GetParent(IID_PPV_ARGS(&dxgiFactory));
 
 		//创建交换链
 		ComPtr<IDXGISwapChain1> swapChain;
-		DX::ThrowIfFailed(
 			dxgiFactory->CreateSwapChainForHwnd(
 				m_d3dDevice.Get(),
 				m_hwnd,
@@ -256,33 +230,24 @@ void DXResources::CreateWindowSizeDependentResources(Math::Size &s)
 				nullptr,
 				nullptr,
 				&swapChain
-			)
-		);
+			);
 
-		DX::ThrowIfFailed(
-			swapChain.As(&m_swapChain)
-		);
+			swapChain.As(&m_swapChain);
 
 		// 确保 DXGI 不会一次对多个帧排队。这样既可以减小延迟，
 		// 又可以确保应用程序将只在每个 VSync 之后渲染，从而最大程度地降低功率消耗。
-		DX::ThrowIfFailed(
-			dxgiDevice->SetMaximumFrameLatency(1)
-		);
+			dxgiDevice->SetMaximumFrameLatency(1);
 	}
 
 	// 创建交换链后台缓冲区的渲染目标视图。
 	ComPtr<ID3D11Texture2D1> backBuffer;
-	DX::ThrowIfFailed(
-		m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))
-	);
+		m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
 
-	DX::ThrowIfFailed(
 		m_d3dDevice->CreateRenderTargetView1(
 			backBuffer.Get(),
 			nullptr,
 			&m_d3dRenderTargetView
-		)
-	);
+		);
 
 	// 根据需要创建用于 3D 渲染的深度模板视图。
 	CD3D11_TEXTURE2D_DESC1 depthStencilDesc(
@@ -295,22 +260,18 @@ void DXResources::CreateWindowSizeDependentResources(Math::Size &s)
 	);
 
 	ComPtr<ID3D11Texture2D1> depthStencil;
-	DX::ThrowIfFailed(
 		m_d3dDevice->CreateTexture2D1(
 			&depthStencilDesc,
 			nullptr,
 			&depthStencil
-		)
-	);
+		);
 
 	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
-	DX::ThrowIfFailed(
 		m_d3dDevice->CreateDepthStencilView(
 			depthStencil.Get(),
 			&depthStencilViewDesc,
 			&m_d3dDepthStencilView
-		)
-	);
+		);
 
 	// 设置用于确定整个窗口的 3D 渲染视区。
 	m_screenViewport = CD3D11_VIEWPORT(
@@ -338,8 +299,7 @@ void DXResources::CreateWindowSizeDependentResources(Math::Size &s)
 	);
 
 	ComPtr<IDXGISurface2> dxgiBackBuffer;
-	DX::ThrowIfFailed(
-	m_swapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer)));
+	m_swapChain->GetBuffer(0, IID_PPV_ARGS(&dxgiBackBuffer));
 	
 	/*
 	ID2D1HwndRenderTarget* pRenderTarget = NULL;   // Render target
@@ -423,10 +383,7 @@ void DXResources::Present()
 	{
 		HandleDeviceLost();
 	}
-	else
-	{
-		DX::ThrowIfFailed(hr);
-	}
+
 }
 
 Math::Size DXResources::GetWindowSize()

@@ -28,6 +28,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="helper.txt">
+      <Filter>着色器资源</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -48,6 +51,9 @@
     <ClInclude Include="Content\SphereAppMain.h">
       <Filter>头文件\Content</Filter>
     </ClInclude>
+    <ClInclude Include="Content\BP_DS.h">
+      <Filter>头文件\Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,6 +66,9 @@
       <Filter>源文件\Content</Filter>
     </ClCompile>
     <ClCompile Include="Content\SphereAppMain.cpp">
+      <Filter>源文件\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\BP_DS.cpp">
       <Filter>源文件\Content</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,13 +101,16 @@
     <FxCompile Include="ShaderResources\Pref_IS_IBL_PS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
-    <FxCompile Include="ShaderResources\Pref_IS_IBL_CS.hlsl">
-      <Filter>着色器资源</Filter>
-    </FxCompile>
     <FxCompile Include="ShaderResources\Origin_IS_IBL_PS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
     <FxCompile Include="ShaderResources\Origin_IS_IBL_VS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\BP_DS_PS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\BP_DS_VS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
   </ItemGroup>

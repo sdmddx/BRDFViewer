@@ -260,7 +260,7 @@ float3 SpecularIBL_DGGX(float3 specularColor, float roughness, float3 n, float3 
 
 
 //ÏñËØ×ÅÉ«Æ÷----------------------------------------------------------------------------------
-float4 main(PixelShaderInput_PBR input) : SV_TARGET
+float4 PS(PixelShaderInput_PBR input) : SV_TARGET
 {
 	float3 n = normalize(input.verNor);
 
@@ -273,7 +273,7 @@ float4 main(PixelShaderInput_PBR input) : SV_TARGET
 }
 
 
-float4 main_(PixelShaderInput_PBR input) : SV_TARGET
+float4 main(PixelShaderInput_PBR input) : SV_TARGET
 {
 
 	return float4(GetCubeMapSample(input.verNor),1.0f);

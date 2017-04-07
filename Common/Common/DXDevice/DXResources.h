@@ -26,6 +26,12 @@ namespace DX
 		void ValidateDevice();
 		void Trim();
 		*/
+
+		~DXResources()
+		{
+			
+		}
+
 		void HandleDeviceLost();
 		void RegisterDeviceNotify(IDeviceNotify* deviceNotify);
 		void Present();

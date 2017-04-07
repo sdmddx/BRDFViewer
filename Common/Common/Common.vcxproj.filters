@@ -111,6 +111,9 @@
     <ClInclude Include="Utilities\ShaderLoader.h">
       <Filter>头文件\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="Utilities\DXBufferCreator.h">
+      <Filter>头文件\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -147,6 +150,9 @@
       <Filter>源文件\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Utilities\ShaderLoader.cpp">
+      <Filter>源文件\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\DXBufferCreator.cpp">
       <Filter>源文件\Utilities</Filter>
     </ClCompile>
   </ItemGroup>

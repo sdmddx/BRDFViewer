@@ -22,6 +22,7 @@
 #include "Utilities\ShaderStructure.h"
 #include "Utilities\ShaderLoader.h"
 #include "Utilities\SdmCamera.h"
+#include "Utilities\DXBufferCreator.h"
 
 #include "Scene\SceneBase.h"
 

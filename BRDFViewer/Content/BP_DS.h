@@ -4,12 +4,12 @@
 
 namespace Example
 {
-	class SphereScene :public Scene::SceneBase
+	class BP_DS :public Scene::SceneBase
 	{
 	public:
-		SphereScene(const std::shared_ptr<DX::DXResources>& dxResources);
+		BP_DS(const std::shared_ptr<DX::DXResources>& dxResources);
 
-		~SphereScene();
+		~BP_DS();
 
 		virtual void CreateDeviceDependentResources();
 		virtual void CreateWindowSizeDependentResources();
@@ -23,18 +23,31 @@ namespace Example
 		std::shared_ptr<DX::DXResources> m_dxResources;
 
 		// 立体几何的 Direct3D 资源。
-		Microsoft::WRL::ComPtr<ID3D11InputLayout>				m_inputLayout;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_vertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11InputLayout>				m_IL_G;
+		Microsoft::WRL::ComPtr<ID3D11InputLayout>				m_IL_S;
+		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_vertexBuffer_G;
+		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_vertexBuffer_S;
 		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_indexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader>				m_vertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader>				m_pixelShader;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader>				m_VS_G;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader>				m_VS_S;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader>				m_PS_G;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader>				m_PS_S;
 		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_WVP;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_PBR;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_Light;
+		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_WVP_Inverse;
+		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_WINDOWINFO;
+		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_LightsInfo;
 
 		//环境图SRV
 		ID3D11ShaderResourceView*								m_SRV_envMap;
-		ID3D11ShaderResourceView*								m_cubeMap[6];
+		//ID3D11ShaderResourceView*								m_cubeMap[6];
+
+		//法线向量纹理SRV
+		ID3D11ShaderResourceView*								m_SRV_verNorTex;
+
+		//光源信息SRV
+		ID3D11ShaderResourceView*								m_SRV_LightInfo;
+
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>          m_RTV_verNorTex;
 
 		Microsoft::WRL::ComPtr<ID3D11SamplerState>				sampler;
 
@@ -42,29 +55,31 @@ namespace Example
 
 		unique_ptr<Utilities::ShaderLoader>						m_shaderLoader;
 
-		
+		//DXBufferCreator
+		Utilities::DXBufferCreator*						m_dxBufferCreator;
+
 		UINT32	m_indexCount;
 
 		//常量缓冲区
 		unique_ptr<CB_WVP>										m_CB_WVP_Data;
-		unique_ptr<CB_PBR>										m_CB_PBR_Data;
-		unique_ptr<CB_Light>									m_CB_Light_Data;
-
+		unique_ptr<CB_WINDOWINFO>								m_CB_WINDOWINFO_Data;//在窗口大小改变时更新该值
+		unique_ptr<CB_WVP_Inverse>								m_CB_WVP_Inverse_Data;
+		unique_ptr<LightsInfo>									m_CB_LightsInfo_Data;
 		//世界变换矩阵的逆矩阵
 		XMMATRIX												model_inverse;
-
+		UINT													numLights;
 		bool m_loadingComplete;
 
 		BOOL m_isLButtonDown;
 		BOOL m_isRButtonDown;
-		
+
 		//不是线程安全的
 		Math::Point m_leftPoint;				//跟踪鼠标左键按下时所在位置，该位置在调用一次update()方法后会更新至最新位置
 		Math::Point m_leftPointMovement;		//在鼠标左键按下时记录移动鼠标后的更新位置
 		Math::Point m_rightPoint;				//跟踪鼠标右键按下时所在位置，该位置在调用一次update()方法后会更新至最新位置
 		Math::Point m_rightPointMovement;		//在鼠标右键按下时记录移动鼠标后的更新位置
-		SHORT m_mouseWheel;			//记录鼠标滑轮滚动delta
-			
+		SHORT m_mouseWheel;						//记录鼠标滑轮滚动delta
+
 	public:
 		//相机变换相应的事件
 		void OnLButtonDown(LPARAM lparam)
@@ -73,13 +88,13 @@ namespace Example
 			m_leftPoint.x = LOWORD(lparam);
 			m_leftPoint.y = HIWORD(lparam);
 			m_leftPointMovement = m_leftPoint;
-			
+
 		}
 
 		void OnLButtonUp(LPARAM lparam)
 		{
-			m_isLButtonDown = false;	
-			
+			m_isLButtonDown = false;
+
 		}
 
 		void OnRButtonDown(LPARAM lparam)
@@ -102,7 +117,7 @@ namespace Example
 		{
 			if (m_isLButtonDown)
 			{
-				m_leftPointMovement.x= LOWORD(lparam);
+				m_leftPointMovement.x = LOWORD(lparam);
 				m_leftPointMovement.y = HIWORD(lparam);
 			}
 			if (m_isRButtonDown)
@@ -125,4 +140,5 @@ namespace Example
 		}
 	};
 }
+
 

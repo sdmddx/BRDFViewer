@@ -1,0 +1,16 @@
+VS:vertex shader
+PS:pixel shader
+CS:compute shader
+BP:Blinn-Phong
+DS:Deferred Shading 
+IBL:Image-based Lighting
+PBR:physical-based rendering
+IS:importance sample
+ISGGX:D项采样GGX模型的重要性采样
+Origin:表示对原始光照方程进行处理
+pref:Pre-filtered
+
+
+
+备注：所有渲染流程.着色器代码未作优化 ;
+	  main函数均做测试用;

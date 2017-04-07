@@ -14,9 +14,9 @@ SphereScene::SphereScene(const std::shared_ptr<DX::DXResources>& dxResources) :
 
 	m_shaderLoader = unique_ptr<Utilities::ShaderLoader>(new Utilities::ShaderLoader(dxResources));
 
-	m_constantBufferData = make_unique<SphereSceneConstantBuffer>();
-	m_CB_PBRData = make_unique<CB_PBR>();
-	m_CB_LightData = make_unique<CB_Light>();
+	m_CB_WVP_Data = make_unique<CB_WVP>();
+	m_CB_PBR_Data = make_unique<CB_PBR>();
+	m_CB_Light_Data = make_unique<CB_Light>();
 
 	CreateWindowSizeDependentResources();
 	CreateDeviceDependentResources();
@@ -62,39 +62,39 @@ void SphereScene::CreateWindowSizeDependentResources()
 
 	XMMATRIX model = XMMatrixIdentity();
 
-	XMStoreFloat4x4(&m_constantBufferData->model, model);
+	XMStoreFloat4x4(&m_CB_WVP_Data->model, model);
 
 	XMStoreFloat4x4(
-		&m_constantBufferData->projection,
+		&m_CB_WVP_Data->projection,
 		XMMatrixTranspose(perspectiveMatrix)
 	);
 
 	// 眼睛位于(0,0.7,1.5)，并沿着 Y 轴使用向上矢量查找点(0,-0.1,0)。
-	static const XMVECTORF32 eye = { 0.0f, 0.0f,-5.0f, 1.0f };
+	static const XMVECTORF32 eye = { 0.0f, 0.0f,-4.0f, 1.0f };
 	static const XMVECTORF32 at = { 0.0f, 0.0f, 0.0f, 1.0f };
 	static const XMVECTORF32 up = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 	m_camera = unique_ptr<Utilities::SdmCamera>(new Utilities::SdmCamera(eye, at, up));
 	//SdmCamera* p = (SdmCamera*)::operator new(sizeof(SdmCamera));
-	XMStoreFloat4x4(&m_constantBufferData->view, XMMatrixTranspose(m_camera->getView()));
+	XMStoreFloat4x4(&m_CB_WVP_Data->view, XMMatrixTranspose(m_camera->GetView()));
 
 	XMVECTOR deter;
 	model_inverse = XMMatrixInverse(&deter, model);
 	//XMVECTOR lightPos = eye;
 	XMVECTOR lightPos = XMVectorSet(2.0f, 2.0f, -2.0f, 1.0f);
 
-	XMStoreFloat3(&m_CB_LightData->lightPos, XMVector4Transform(lightPos, model_inverse));
-	m_CB_LightData->baseColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	//XMStoreFloat3(&m_CB_LightData->viewPos, XMVector4Transform(XMLoadFloat4(&m_camera->getEye()), model_inverse));
-	m_CB_PBRData->roughness = 0.2f;
-	m_CB_PBRData->metalic = 0.7f;
-	m_CB_PBRData->specular = 0.08f;
-	m_CB_PBRData->specularTint = 1.0f;
-	m_CB_PBRData->clearCoat = 0.25f;
-	m_CB_PBRData->clearCoatGloss = 0.5f;
-	m_CB_PBRData->D_GTR_N = 2.0f;
-	m_CB_PBRData->D_GTR_C = 0.25f;
-	m_CB_PBRData->anisotropic = 1.0f;
+	XMStoreFloat3(&m_CB_Light_Data->lightPos, XMVector4Transform(lightPos, model_inverse));
+	m_CB_Light_Data->baseColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	//XMStoreFloat3(&m_CB_Light_Data->viewPos, XMVector4Transform(XMLoadFloat4(&m_camera->GetEye()), model_inverse));
+	m_CB_PBR_Data->roughness = 0.2f;
+	m_CB_PBR_Data->metalic = 0.7f;
+	m_CB_PBR_Data->specular = 0.08f;
+	m_CB_PBR_Data->specularTint = 1.0f;
+	m_CB_PBR_Data->clearCoat = 0.25f;
+	m_CB_PBR_Data->clearCoatGloss = 0.5f;
+	m_CB_PBR_Data->D_GTR_N = 2.0f;
+	m_CB_PBR_Data->D_GTR_C = 0.25f;
+	m_CB_PBR_Data->anisotropic = 1.0f;
 
 }
 
@@ -111,6 +111,7 @@ void SphereScene::CreateDeviceDependentResources()
 	dwShaderFlags |= D3DCOMPILE_DEBUG;
 #endif
 
+	HRESULT hr = S_FALSE;
 
 	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
@@ -119,40 +120,37 @@ void SphereScene::CreateDeviceDependentResources()
 
 	};
 	
-	m_shaderLoader->CreateVertexShader_IA(L"ShaderResources\\Pref_IS_IBL_VS.hlsl", "main", "vs_5_0", dwShaderFlags,
+	hr = m_shaderLoader->CreateVertexShader_IA(L"ShaderResources\\Pref_IS_IBL_VS.hlsl", "VS", "vs_5_0", dwShaderFlags,
 		m_vertexShader, 
 		vertexDesc,
 		ARRAYSIZE(vertexDesc),
 		m_inputLayout);
 
-	m_shaderLoader->CreatePixelShader(L"ShaderResources\\Pref_IS_IBL_PS.hlsl", "main_", "ps_5_0", dwShaderFlags,
+	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\Pref_IS_IBL_PS.hlsl", "main", "ps_5_0", dwShaderFlags,
 		m_pixelShader);
 
-	CD3D11_BUFFER_DESC constantBufferDesc(sizeof(CB_MVP), D3D11_BIND_CONSTANT_BUFFER);
-	DX::ThrowIfFailed(
+	CD3D11_BUFFER_DESC CB_MCP_Desc(sizeof(CB_MVP), D3D11_BIND_CONSTANT_BUFFER);
 		m_dxResources->GetD3DDevice()->CreateBuffer(
-			&constantBufferDesc,
+			&CB_MCP_Desc,
 			nullptr,
-			&m_constantBuffer_WVP
-		)
+			&m_D3D_CB_WVP
+		
 	);
 
 	CD3D11_BUFFER_DESC constantBufferDesc_Light(sizeof(CB_Light), D3D11_BIND_CONSTANT_BUFFER);
-	DX::ThrowIfFailed(
 		m_dxResources->GetD3DDevice()->CreateBuffer(
 			&constantBufferDesc_Light,
 			nullptr,
-			&m_CB_Light
-		)
+			&m_D3D_CB_Light
+		
 	);
 
 	CD3D11_BUFFER_DESC constantBufferDesc_PBR(sizeof(CB_PBR), D3D11_BIND_CONSTANT_BUFFER);
-	DX::ThrowIfFailed(
 		m_dxResources->GetD3DDevice()->CreateBuffer(
 			&constantBufferDesc_PBR,
 			nullptr,
-			&m_CB_PBR
-		)
+			&m_D3D_CB_PBR
+		
 	);
 
 	
@@ -164,29 +162,28 @@ void SphereScene::CreateDeviceDependentResources()
 	m_dataBuf = pSphere->GenerateSpherePvN(4);
 	
 	unsigned int vertexCount = m_dataBuf->GetBufMeshByIndex(0)->GetCntVertex();
-	Vertex_PosVernor* pVertexPosBuf = (Vertex_PosVernor*)malloc(sizeof(Vertex_PosVernor)*vertexCount);
+	Vertex_PosVernor* pVertexBuf = (Vertex_PosVernor*)malloc(sizeof(Vertex_PosVernor)*vertexCount);
 	for (unsigned int index = 0; index < vertexCount; ++index)
 	{
-		pVertexPosBuf[index].pos = m_dataBuf->GetBufMeshByIndex(0)->pVertex[index];
-		pVertexPosBuf[index].vernor = m_dataBuf->GetBufMeshByIndex(0)->pVertexNormal[index];
+		pVertexBuf[index].pos = m_dataBuf->GetBufMeshByIndex(0)->pVertex[index];
+		pVertexBuf[index].vernor = m_dataBuf->GetBufMeshByIndex(0)->pVertexNormal[index];
 
 	}
 
 
 	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 };
-	vertexBufferData.pSysMem = pVertexPosBuf;
+	vertexBufferData.pSysMem = pVertexBuf;
 	vertexBufferData.SysMemPitch = 0;
 	vertexBufferData.SysMemSlicePitch = 0;
 	CD3D11_BUFFER_DESC vertexBufferDesc(vertexCount * sizeof(Vertex_PosVernor), D3D11_BIND_VERTEX_BUFFER);
-	DX::ThrowIfFailed(
 		m_dxResources->GetD3DDevice()->CreateBuffer(
 			&vertexBufferDesc,
 			&vertexBufferData,
 			&m_vertexBuffer
-		)
+		
 	);
 
-	free(pVertexPosBuf);
+	free(pVertexBuf);
 
 	unsigned int faceCount = m_dataBuf->GetBufMeshByIndex(0)->GetCntFace();
 	m_indexCount = faceCount * 3;
@@ -208,28 +205,26 @@ void SphereScene::CreateDeviceDependentResources()
 	indexBufferData.SysMemPitch = 0;
 	indexBufferData.SysMemSlicePitch = 0;
 	CD3D11_BUFFER_DESC indexBufferDesc(m_indexCount * sizeof(unsigned int), D3D11_BIND_INDEX_BUFFER);
-	DX::ThrowIfFailed(
 		m_dxResources->GetD3DDevice()->CreateBuffer(
 			&indexBufferDesc,
 			&indexBufferData,
 			&m_indexBuffer
-		)
+		
 	);
 
 	free(psphereIndices);
 
-	HRESULT hr = S_FALSE;
 	//加载纹理
-	//hr = D3DX11CreateShaderResourceViewFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\sdm.bmp", NULL, 0, &m_envMap, 0);
+	//hr = D3DX11CreateShaderResourceViewFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\sdm.bmp", NULL, 0, &m_SRV_envMap, 0);
 	//绑定像素着色器资源
-	//m_dxResources->GetD3DDeviceContext()->PSSetShaderResources(0, 1, &m_envMap);
+	//m_dxResources->GetD3DDeviceContext()->PSSetShaderResources(0, 1, &m_SRV_envMap);
 	//Microsoft::WRL::ComPtr<ID3D11Resource> envMap = NULL;
 	//Microsoft::WRL::ComPtr<ID3D11Resource> pTex = NULL;
 	//hr = D3DX11CreateTextureFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\sdm.jpg", 0, 0, &envMap, 0);
 	//D3D11_SHADER_RESOURCE_VIEW_DESC envMap_Desc;
 	
 
-	//hr = m_dxResources->GetD3DDevice()->CreateShaderResourceView(envMap.Get(), NULL, &m_envMap);
+	//hr = m_dxResources->GetD3DDevice()->CreateShaderResourceView(envMap.Get(), NULL, &m_SRV_envMap);
 	
 	// 加载立方体后，就可以呈现该对象了。
 
@@ -316,10 +311,10 @@ void SphereScene::CreateDeviceDependentResources()
 	hr = m_dxResources->GetD3DDevice()->CreateShaderResourceView(
 		image_texture.Get(),
 			&tVDesc,
-			&m_envMap);
+			&m_SRV_envMap);
 
 	//绑定像素着色器资源
-	m_dxResources->GetD3DDeviceContext()->PSSetShaderResources(0, 1, &m_envMap);
+	m_dxResources->GetD3DDeviceContext()->PSSetShaderResources(0, 1, &m_SRV_envMap);
 
 	//设置采样器状态
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -394,10 +389,10 @@ void SphereScene::Update(Utilities::StepTimer const& timer)
 	}
 
 	//最后更新观察矩阵
-	XMStoreFloat4x4(&m_constantBufferData->view, XMMatrixTranspose(m_camera->getView()));
+	XMStoreFloat4x4(&m_CB_WVP_Data->view, XMMatrixTranspose(m_camera->GetView()));
 
 	//更新观察者视点位置
-	XMStoreFloat3(&m_CB_LightData->viewPos, XMVector4Transform(XMLoadFloat4(&m_camera->getEye()), model_inverse));
+	XMStoreFloat3(&m_CB_Light_Data->viewPos, XMVector4Transform(XMLoadFloat4(&m_camera->GetEye()), model_inverse));
 }
 
 void SphereScene::ReleaseDeviceDependentResources()
@@ -406,46 +401,58 @@ void SphereScene::ReleaseDeviceDependentResources()
 	m_vertexShader.Reset();
 	m_inputLayout.Reset();
 	m_pixelShader.Reset();
-	m_constantBuffer_WVP.Reset();
-	m_CB_PBR.Reset();
-	m_CB_Light.Reset();
+	m_D3D_CB_WVP.Reset();
+	m_D3D_CB_PBR.Reset();
+	m_D3D_CB_Light.Reset();
 	m_vertexBuffer.Reset();
 	m_indexBuffer.Reset();
 
 	m_camera = nullptr;
-	m_shaderLoader = nullptr;
 	sampler.Reset();
-	m_envMap->Release();
+	m_SRV_envMap->Release();
 	
 }
 
 // 使用顶点和像素着色器呈现一个帧。
 void SphereScene::Render()
 {
+
+	
+
 	// 加载是异步的。仅在加载几何图形后才会绘制它。
 	if (!m_loadingComplete)
 	{
 		return;
 	}
-
 	auto context = m_dxResources->GetD3DDeviceContext();
+	// 将视区重置为针对整个屏幕。
+	auto viewport = m_dxResources->GetScreenViewport();
+	context->RSSetViewports(1, &viewport);
+
+	// 将呈现目标重置为屏幕。
+	ID3D11RenderTargetView *const targets[1] = { m_dxResources->GetBackBufferRenderTargetView() };
+	context->OMSetRenderTargets(1, targets, m_dxResources->GetDepthStencilView());
+
+	// 清除后台缓冲区和深度模具视图。
+	context->ClearRenderTargetView(m_dxResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
+	context->ClearDepthStencilView(m_dxResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// 准备常量缓冲区以将其发送到图形设备。
 	context->UpdateSubresource(
-		m_constantBuffer_WVP.Get(),
+		m_D3D_CB_WVP.Get(),
 		0,
 		NULL,
-		m_constantBufferData.get(),
+		m_CB_WVP_Data.get(),
 		0,
 		0
 	);
 
 	context->UpdateSubresource(
-		m_CB_Light.Get(), 0, NULL, m_CB_LightData.get(), 0, 0
+		m_D3D_CB_Light.Get(), 0, NULL, m_CB_Light_Data.get(), 0, 0
 	);
 
 	context->UpdateSubresource(
-		m_CB_PBR.Get(), 0, NULL, m_CB_PBRData.get(), 0, 0
+		m_D3D_CB_PBR.Get(), 0, NULL, m_CB_PBR_Data.get(), 0, 0
 	);
 
 	// 每个顶点都是 VertexPositionColor 结构的一个实例。
@@ -461,7 +468,7 @@ void SphereScene::Render()
 
 	context->IASetIndexBuffer(
 		m_indexBuffer.Get(),
-		DXGI_FORMAT_R32_UINT, // 每个索引都是一个 16 位无符号整数(short)。
+		DXGI_FORMAT_R32_UINT, // 每个索引都是一个 32 位无符号整数(short)。
 		0
 	);
 
@@ -483,15 +490,15 @@ void SphereScene::Render()
 	context->VSSetConstantBuffers(
 		0,
 		1,
-		m_constantBuffer_WVP.GetAddressOf()
+		m_D3D_CB_WVP.GetAddressOf()
 	);
 
 	context->PSSetConstantBuffers(
-		0, 1, m_CB_Light.GetAddressOf()
+		0, 1, m_D3D_CB_Light.GetAddressOf()
 	);
 
 	context->PSSetConstantBuffers(
-		1, 1, m_CB_PBR.GetAddressOf()
+		1, 1, m_D3D_CB_PBR.GetAddressOf()
 	);
 
 	// 附加我们的像素着色器。

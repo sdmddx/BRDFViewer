@@ -156,6 +156,7 @@
     <ClInclude Include="Scene\SceneBase.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Utilities\DXBufferCreator.h" />
     <ClInclude Include="Utilities\SdmCamera.h" />
     <ClInclude Include="Utilities\ShaderLoader.h" />
     <ClInclude Include="Utilities\ShaderStructure.h" />
@@ -176,6 +177,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Utilities\DXBufferCreator.cpp" />
     <ClCompile Include="Utilities\SdmCamera.cpp" />
     <ClCompile Include="Utilities\ShaderLoader.cpp" />
     <ClCompile Include="Utilities\StepTimer.cpp" />

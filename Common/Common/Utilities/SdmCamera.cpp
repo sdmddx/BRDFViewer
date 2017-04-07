@@ -18,12 +18,18 @@ SdmCamera::SdmCamera(const XMVECTOR& eye, const XMVECTOR& at, const XMVECTOR& up
 	mView = XMMatrixLookAtRH(XMLoadFloat4(&mEye), XMLoadFloat4(&mAt), XMLoadFloat4(&mNorUp));
 }
 
-const XMMATRIX& SdmCamera::getView()
+XMMATRIX& SdmCamera::GetView()
 {
 	mView = XMMatrixLookAtLH(XMLoadFloat4(&mEye), XMLoadFloat4(&mAt), XMLoadFloat4(&mNorUp));
 	return mView;
 }
 
+ XMMATRIX& SdmCamera::GetInverseView()
+{
+	mView = XMMatrixLookAtLH(XMLoadFloat4(&mEye), XMLoadFloat4(&mAt), XMLoadFloat4(&mNorUp));
+	XMVECTOR deter;
+	return XMMatrixInverse(&deter, mView);
+}
 
 void SdmCamera::TransformModeA(float angle)
 {
@@ -62,7 +68,7 @@ void SdmCamera::TransformModeC(float angle)
 void SdmCamera::TransformModeD(float angle)
 {
 
-	XMMATRIX view = getView();
+	XMMATRIX view = GetView();
 	XMVECTOR deter;
 	XMStoreFloat4(&mNorRight, XMVector4Transform(XMLoadFloat4(&mNorRight), view*XMMatrixTranslationFromVector(XMLoadFloat4(&mEyeDir))*XMMatrixRotationX(angle)*XMMatrixTranslationFromVector(XMLoadFloat4(&mEyeDir))*XMMatrixInverse(&deter, view)));
 	XMStoreFloat4(&mNorUp, XMVector4Transform(XMLoadFloat4(&mNorUp), view*XMMatrixTranslationFromVector(XMLoadFloat4(&mEyeDir))*XMMatrixRotationX(angle)*XMMatrixTranslationFromVector(XMLoadFloat4(&mEyeDir))*XMMatrixInverse(&deter, view)));
@@ -77,7 +83,7 @@ void SdmCamera::TransformModeD(float angle)
 
 void SdmCamera::TransformModeE(float angle)
 {
-	XMMATRIX view = getView();
+	XMMATRIX view = GetView();
 	XMVECTOR deter;
 	XMStoreFloat4(&mNorRight, XMVector4Transform(XMLoadFloat4(&mNorRight), view*XMMatrixRotationX(angle)*XMMatrixInverse(&deter, view)));
 	XMStoreFloat4(&mNorUp, XMVector4Transform(XMLoadFloat4(&mNorUp), view*XMMatrixRotationX(angle)*XMMatrixInverse(&deter, view)));
@@ -103,7 +109,7 @@ void SdmCamera::TransformModeG(XMFLOAT4 focus)
 
 }
 
-XMFLOAT4& SdmCamera::getEye()
+XMFLOAT4& SdmCamera::GetEye()
 {
 	return mEye;
 }

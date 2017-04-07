@@ -4,15 +4,6 @@
 
 namespace DX
 {
-	inline void ThrowIfFailed(HRESULT hr)
-	{
-		if (FAILED(hr))
-		{
-			// 在此行中设置断点，以捕获 Win32 API 错误。
-			//throw Platform::Exception::CreateException(hr);
-			
-		}
-	}
 
 #define SAFERELEASE(p) {if (p) {p->Release();} p = nullptr;}
 

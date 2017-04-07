@@ -28,7 +28,7 @@ cbuffer CB_PBR : register(b1)
 //像素着色器输入结构
 struct PixelShaderInput_PBR
 {
-	float4 pos : SV_POSITION;
+	float4 pos : SV_POSITION;		//经PS插值后变成对应位置的像素值左上角为（0，0）
 	float3 posModel:TEXCOORD0;
 	float3 verNor:TEXCOORD1;
 };
@@ -285,7 +285,7 @@ float3 ApproximateSpecularIBL(float3 specularColor, float roughness, float3 N, f
 }
 
 //像素着色器----------------------------------------------------------------------------------
-float4 main(PixelShaderInput_PBR input) : SV_TARGET
+float4 PS(PixelShaderInput_PBR input) : SV_TARGET
 {
 	float3 n = normalize(input.verNor);
 	float3 v = normalize(viewPos - input.posModel);
@@ -296,8 +296,7 @@ float4 main(PixelShaderInput_PBR input) : SV_TARGET
 
 }
 
-float4 main_(PixelShaderInput_PBR input) : SV_TARGET
+float4 main(PixelShaderInput_PBR input) : SV_TARGET
 {
-
 	return float4(GetCubeMapSample(input.verNor),1.0f);
 }

@@ -7,7 +7,7 @@
 
 #include "BRDFViewer.h"
 
-shared_ptr<Example::SphereScene> sphereScene;
+shared_ptr<Example::BP_DS> sphereScene;
 
 // 全局变量: 
 HINSTANCE hInst;                                // 当前实例
@@ -44,7 +44,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	unique_ptr<Example::SphereAppMain> main = unique_ptr<Example::SphereAppMain>(new Example::SphereAppMain(dxResources));
 
 	//创建一个场景
-	sphereScene = shared_ptr<Example::SphereScene>(new Example::SphereScene(dxResources));
+	sphereScene = shared_ptr<Example::BP_DS>(new Example::BP_DS(dxResources));
 
 	main->GetScene(sphereScene);
 
