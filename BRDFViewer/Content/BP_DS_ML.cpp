@@ -34,7 +34,7 @@ BP_DS::BP_DS(const std::shared_ptr<DX::DXResources>& dxResources) :
 
 BP_DS::~BP_DS()
 {
-
+	ReleaseDeviceDependentResources();
 }
 // 当窗口的大小改变时初始化视图参数。
 void BP_DS::CreateWindowSizeDependentResources()
@@ -89,7 +89,7 @@ void BP_DS::CreateWindowSizeDependentResources()
 
 	XMVECTOR deter;
 	model_inverse = XMMatrixInverse(&deter, model);
-
+	XMStoreFloat4x4(&m_CB_WVP_Inverse_Data->model_Inverse, XMMatrixTranspose(model_inverse));
 	m_CB_WINDOWINFO_Data->height= float(m_dxResources->GetWindowSize().Height);
 	m_CB_WINDOWINFO_Data->width = float(m_dxResources->GetWindowSize().Width);
 	m_CB_WINDOWINFO_Data->fovAngleY = fovAngleY/2.0f;
@@ -119,32 +119,30 @@ void BP_DS::CreateDeviceDependentResources()
 	{
 		{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL",     0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD",  0, DXGI_FORMAT_R32G32_FLOAT,       0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	hr = m_shaderLoader->CreateVertexShader_IA(L"ShaderResources\\BP_DS_VS.hlsl", "VS_G", "vs_5_0", dwShaderFlags,
+	hr = m_shaderLoader->CreateVertexShader_IA(L"ShaderResources\\BP_DS_ML_VS.hlsl", "VS_G", "vs_5_0",
 		m_VS_G, 
 		vertexDesc_G,
 		ARRAYSIZE(vertexDesc_G),
 		m_IL_G);
 
-	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\BP_DS_PS.hlsl", "PS_G", "ps_5_0", dwShaderFlags,
+	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\BP_DS_ML_PS.hlsl", "PS_G", "ps_5_0",
 		m_PS_G);
 
 	//加载S过程着色器及创建输入布局
 	static const D3D11_INPUT_ELEMENT_DESC vertexDesc_S[] =
 	{
 		{ "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD",  0, DXGI_FORMAT_R32G32_FLOAT,       0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	hr = m_shaderLoader->CreateVertexShader_IA(L"ShaderResources\\BP_DS_VS.hlsl", "VS_S", "vs_5_0", dwShaderFlags,
+	hr = m_shaderLoader->CreateVertexShader_IA(L"ShaderResources\\BP_DS_ML_VS.hlsl", "VS_S", "vs_5_0",
 		m_VS_S,
 		vertexDesc_S,
 		ARRAYSIZE(vertexDesc_S),
 		m_IL_S);
 
-	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\BP_DS_PS.hlsl", "PS_S", "ps_5_0", dwShaderFlags,
+	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\BP_DS_ML_PS.hlsl", "PS_S", "ps_5_0",
 		m_PS_S);
 
 	//创建常量缓冲区
@@ -198,7 +196,7 @@ void BP_DS::CreateDeviceDependentResources()
 		m_dxResources->GetD3DDevice()->CreateBuffer(
 			&vertexBufferDesc_G,
 			&vertexBufferData,
-			&m_vertexBuffer_G
+			&m_VB_G
 		
 	);
 
@@ -209,7 +207,6 @@ void BP_DS::CreateDeviceDependentResources()
 	for (unsigned int index = 0; index < vertexCount; ++index)
 	{
 		pVertexBuf_S[index].pos = m_dataBuf->GetBufMeshByIndex(0)->pVertex[index];
-		//pVertexBuf_S[index].tex = m_dataBuf->GetBufMeshByIndex(0)->pPositiveFaceIndexUV[index];
 
 	}
 
@@ -220,7 +217,7 @@ void BP_DS::CreateDeviceDependentResources()
 	m_dxResources->GetD3DDevice()->CreateBuffer(
 		&vertexBufferDesc_S,
 		&vertexBufferData,
-		&m_vertexBuffer_S
+		&m_VB_S
 
 	);
 
@@ -315,9 +312,9 @@ void BP_DS::CreateDeviceDependentResources()
 	tex_desc.SampleDesc.Quality = 0;
 	tex_desc.Usage = D3D11_USAGE_DEFAULT;
 
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> verNorTex;
+	
 
-	hr = m_dxResources->GetD3DDevice()->CreateTexture2D(&tex_desc, NULL, &verNorTex);
+	hr = m_dxResources->GetD3DDevice()->CreateTexture2D(&tex_desc, NULL, &m_tex_verNor);
 
 	D3D11_RENDER_TARGET_VIEW_DESC RTV_Desc_verNor;
 
@@ -325,7 +322,7 @@ void BP_DS::CreateDeviceDependentResources()
 	RTV_Desc_verNor.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	RTV_Desc_verNor.Texture2D.MipSlice = 0;
 
-	hr = m_dxResources->GetD3DDevice()->CreateRenderTargetView(verNorTex.Get(), &RTV_Desc_verNor, &m_RTV_verNorTex);
+	hr = m_dxResources->GetD3DDevice()->CreateRenderTargetView(m_tex_verNor.Get(), &RTV_Desc_verNor, &m_RTV_verNorTex);
 
 	//创建第二个过程的着色器资源视图
 	D3D11_SHADER_RESOURCE_VIEW_DESC Desc_S;
@@ -336,7 +333,7 @@ void BP_DS::CreateDeviceDependentResources()
 	Desc_S.Texture2D.MostDetailedMip = 0;
 
 	hr = m_dxResources->GetD3DDevice()->CreateShaderResourceView(
-		verNorTex.Get(),
+		m_tex_verNor.Get(),
 		&Desc_S,
 		&m_SRV_verNorTex);
 
@@ -418,16 +415,15 @@ void BP_DS::ReleaseDeviceDependentResources()
 	m_VS_S.Reset();
 	m_PS_G.Reset();
 	m_PS_S.Reset();
-	m_vertexBuffer_G.Reset();
-	m_vertexBuffer_S.Reset();
+	m_VB_G.Reset();
+	m_VB_S.Reset();
 	m_D3D_CB_WINDOWINFO.Reset();
 	m_D3D_CB_WVP.Reset();
 	m_D3D_CB_WVP_Inverse.Reset();
 	m_D3D_CB_LightsInfo.Reset();
 
 	m_indexBuffer.Reset();
-
-	m_camera = nullptr;
+	m_tex_verNor.Reset();
 	sampler.Reset();
 	m_SRV_envMap->Release();
 	m_SRV_verNorTex->Release();
@@ -440,7 +436,6 @@ void BP_DS::ReleaseDeviceDependentResources()
 // 使用顶点和像素着色器呈现一个帧。
 void BP_DS::Render()
 {
-	// 加载是异步的。仅在加载几何图形后才会绘制它。
 	if (!m_loadingComplete)
 	{
 		return;
@@ -472,7 +467,7 @@ void BP_DS::Render()
 	context->IASetVertexBuffers(
 		0,
 		1,
-		m_vertexBuffer_G.GetAddressOf(),
+		m_VB_G.GetAddressOf(),
 		&stride,
 		&offset
 	);
@@ -515,7 +510,7 @@ void BP_DS::Render()
 		0
 	);
 
-	//第二步  光照过程
+	//第二步  着色过程
 
 	// 将视区重置为针对整个屏幕。
 	auto viewport = m_dxResources->GetScreenViewport();
@@ -561,7 +556,7 @@ void BP_DS::Render()
 	context->IASetVertexBuffers(
 		0,
 		1,
-		m_vertexBuffer_S.GetAddressOf(),
+		m_VB_S.GetAddressOf(),
 		&stride,
 		&offset
 	);

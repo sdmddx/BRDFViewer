@@ -1,6 +1,5 @@
 //对原始基于PBR的反射方程进行重要性采样获得
-// 存储用于组合几何图形的三个基本列优先矩阵的常量缓冲区。
-//未作优化
+
 cbuffer CB_MVP : register(b0)
 {
 	matrix model;

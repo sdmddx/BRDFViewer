@@ -25,8 +25,8 @@ namespace Example
 		// 立体几何的 Direct3D 资源。
 		Microsoft::WRL::ComPtr<ID3D11InputLayout>				m_IL_G;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout>				m_IL_S;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_vertexBuffer_G;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_vertexBuffer_S;
+		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_VB_G;
+		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_VB_S;
 		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_indexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader>				m_VS_G;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader>				m_VS_S;
@@ -39,15 +39,15 @@ namespace Example
 
 		//环境图SRV
 		ID3D11ShaderResourceView*								m_SRV_envMap;
-		//ID3D11ShaderResourceView*								m_cubeMap[6];
 
-		//法线向量纹理SRV
+		//法线向量纹理SRV RTV
+		Microsoft::WRL::ComPtr<ID3D11Texture2D>					m_tex_verNor;
 		ID3D11ShaderResourceView*								m_SRV_verNorTex;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>          m_RTV_verNorTex;
 
 		//光源信息SRV
 		ID3D11ShaderResourceView*								m_SRV_LightInfo;
 
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>          m_RTV_verNorTex;
 
 		Microsoft::WRL::ComPtr<ID3D11SamplerState>				sampler;
 

@@ -4,7 +4,7 @@ using namespace Utilities;
 
 ShaderLoader::ShaderLoader(const std::shared_ptr<DX::DXResources>& dxResources)
 {
-	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+	dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 
 #if defined( DEBUG ) || defined( _DEBUG )
 	// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
@@ -17,10 +17,10 @@ ShaderLoader::ShaderLoader(const std::shared_ptr<DX::DXResources>& dxResources)
 	m_dxResources = dxResources;
 }
 
-HRESULT ShaderLoader::CreateVertexShader_IA(LPCWSTR pSrcFile, LPCSTR pFunctionName, LPCSTR pProfile, DWORD dwShaderFlags, Microsoft::WRL::ComPtr<ID3D11VertexShader>& pVS,const D3D11_INPUT_ELEMENT_DESC* vertexDesc, UINT numElem, Microsoft::WRL::ComPtr<ID3D11InputLayout>& inputLayout)
+HRESULT ShaderLoader::CreateVertexShader_IA(LPCWSTR pSrcFile, LPCSTR pFunctionName, LPCSTR pProfile, Microsoft::WRL::ComPtr<ID3D11VertexShader>& pVS,const D3D11_INPUT_ELEMENT_DESC* vertexDesc, UINT numElem, Microsoft::WRL::ComPtr<ID3D11InputLayout>& inputLayout)
 {
 	ID3DBlob* pBlob, *pErrorBlob;
-	HRESULT hr = S_FALSE;
+	HRESULT hr = E_FAIL;
 	hr = D3DX11CompileFromFile(pSrcFile, NULL, NULL, pFunctionName, pProfile, dwShaderFlags, 0, NULL, &pBlob, &pErrorBlob, NULL);
 	if (!FAILED(hr))
 	{
@@ -47,11 +47,12 @@ HRESULT ShaderLoader::CreateVertexShader_IA(LPCWSTR pSrcFile, LPCSTR pFunctionNa
 	return hr;
 }
 
-HRESULT ShaderLoader::CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, LPCSTR pProfile, DWORD dwShaderFlags, Microsoft::WRL::ComPtr<ID3D11PixelShader>& pPS)
+HRESULT ShaderLoader::CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, LPCSTR pProfile, Microsoft::WRL::ComPtr<ID3D11PixelShader>& pPS)
 {
 	ID3DBlob* pBlob, *pErrorBlob;
-	HRESULT hr = S_FALSE;
-	if (!FAILED(D3DX11CompileFromFile(pSrcFile, NULL, NULL, pFunctionName, pProfile, dwShaderFlags, 0, NULL, &pBlob, &pErrorBlob, NULL)))
+	HRESULT hr = E_FAIL;
+	hr = D3DX11CompileFromFile(pSrcFile, NULL, NULL, pFunctionName, pProfile, dwShaderFlags, 0, NULL, &pBlob, &pErrorBlob, NULL);
+	if (!FAILED(hr))
 	{
 		hr = m_dxResources->GetD3DDevice()->CreatePixelShader(
 		pBlob->GetBufferPointer(),
@@ -59,6 +60,24 @@ HRESULT ShaderLoader::CreatePixelShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, 
 		nullptr,
 		&pPS
 	);
+	}
+	SAFERELEASE(pBlob);
+	SAFERELEASE(pErrorBlob);
+	return hr;
+}
+
+HRESULT ShaderLoader::CreateComputeShader(LPCWSTR pSrcFile, LPCSTR pFunctionName, LPCSTR pProfile, Microsoft::WRL::ComPtr<ID3D11ComputeShader>& pCS)
+{
+	ID3DBlob* pBlob, *pErrorBlob;
+	HRESULT hr = E_FAIL;
+	if (!FAILED(D3DX11CompileFromFile(pSrcFile, NULL, NULL, pFunctionName, pProfile, dwShaderFlags, 0, NULL, &pBlob, &pErrorBlob, NULL)))
+	{
+		hr = m_dxResources->GetD3DDevice()->CreateComputeShader(
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
+			nullptr,
+			&pCS
+		);
 	}
 	SAFERELEASE(pBlob);
 	SAFERELEASE(pErrorBlob);

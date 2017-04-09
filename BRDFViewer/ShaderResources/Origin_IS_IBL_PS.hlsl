@@ -2,9 +2,9 @@ cbuffer CB_Light : register(b0)
 {
 	float4 baseColor;							//基色
 	float3 lightPos;							//光源位置
-	float unused0;
+	float unused0_CB_Light;
 	float3 viewPos;								//视点（观察者）位置-----已转换到模型空间下
-	float unused1;
+	float unused1_CB_Light;
 
 }
 
@@ -19,9 +19,9 @@ cbuffer CB_PBR : register(b1)
 	float D_GTR_C;								//第一层specularD项GTR模型的调整量c
 	float D_GTR_N;								//第一层specularD项GTR模型的n    通常取值在1.0f到2.0f
 	float anisotropic;							//各向异性
-	float unused2;
-	float unused3;
-	float unused4;
+	float unused0_CB_PBR;
+	float unused1_CB_PBR;
+	float unused2_CB_PBR;
 }
 //像素着色器输入结构
 struct PixelShaderInput_PBR

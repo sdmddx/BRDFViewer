@@ -9,7 +9,7 @@ IS:importance sample
 ISGGX:D项采样GGX模型的重要性采样
 Origin:表示对原始光照方程进行处理
 pref:Pre-filtered
-
+ML:multiple lights
 
 
 备注：所有渲染流程.着色器代码未作优化 ;

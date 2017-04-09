@@ -37,6 +37,7 @@ struct CB_WINDOWINFO
 struct CB_WVP_Inverse
 {
 	XMFLOAT4X4 view_Inverse;
+	XMFLOAT4X4 model_Inverse;
 	XMFLOAT4 viewPos;
 };
 
@@ -77,6 +78,20 @@ struct CB_PBR
 	float unused3;
 	float unused4;
 
+};
+
+struct CB_MatInfo
+{
+	XMFLOAT3 diffuse;
+	FLOAT unused0;
+	XMFLOAT3 specular;
+	FLOAT unused1;
+};
+
+struct CB_MatInfo_albedo_metalness
+{
+	XMFLOAT3 albedo;
+	FLOAT metalness;
 };
 
 // 用于向顶点着色器发送每个顶点的数据。

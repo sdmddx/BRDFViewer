@@ -12,7 +12,7 @@ SamplerState Sampler:register(s0);
 struct VS_OUT_G
 {
 	float4 pos:SV_POSITION;
-	float3 w_verNor:NORMAL;	//位于世界空间下
+	float3 w_verNor:NORMAL0;	//位于世界空间下
 	//float2 tex:TEXCOORD0;
 
 };
@@ -20,7 +20,7 @@ struct VS_OUT_G
 //PS out
 struct PS_OUT_G
 {
-	float4 w_verNor:SV_TARGET0;		//这里只存储发现信息
+	float4 w_verNor:SV_TARGET0;		//这里只存储法线信息
 };
 
 //G过程PS
@@ -48,6 +48,7 @@ cbuffer WindowInfo:register(b0)
 cbuffer WVP_Inverse:register(b1)
 {
 	matrix view_Inverse;
+	matrix model_Inverse;
 	float4 viewPos;					//观察者位置
 	//float unused0_WVP_Inverse;
 }

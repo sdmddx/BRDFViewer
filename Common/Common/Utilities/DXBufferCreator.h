@@ -97,7 +97,52 @@ namespace Utilities
 				ppBuffer);
 		}
 
-	//创建Texture2D并从中创建RTV SRV
+		//创建Texture2D并从中创建RTV SRV
+		HRESULT CreateTexSRVUAV(ID3D11Device3* pd3dDevice,Math::Size &size, DXGI_FORMAT tex_format,ID3D11Texture2D** pptex2D, ID3D11ShaderResourceView** ppSRV,ID3D11UnorderedAccessView** ppUAV)
+		{
+			HRESULT hr = E_FAIL;
+			//
+			D3D11_TEXTURE2D_DESC tex_desc = { 0 };
+			tex_desc.ArraySize = 1;
+			tex_desc.BindFlags = D3D11_BIND_SHADER_RESOURCE|D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+			tex_desc.CPUAccessFlags = 0;
+			tex_desc.Format = tex_format;
+			tex_desc.Height = size.Height;
+			tex_desc.Width = size.Width;
+			tex_desc.MipLevels = 1;
+			tex_desc.MiscFlags = 0;
+			tex_desc.SampleDesc.Count = 1;
+			tex_desc.SampleDesc.Quality = 0;
+			tex_desc.Usage = D3D11_USAGE_DEFAULT;
+
+			hr = pd3dDevice->CreateTexture2D(&tex_desc, NULL, pptex2D);
+
+			//
+			D3D11_SHADER_RESOURCE_VIEW_DESC Desc_S;
+			ZeroMemory(&Desc_S, sizeof(Desc_S));
+			Desc_S.Format = tex_desc.Format;
+			Desc_S.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			Desc_S.Texture2D.MipLevels = tex_desc.MipLevels;
+			Desc_S.Texture2D.MostDetailedMip = 0;
+
+			hr = pd3dDevice->CreateShaderResourceView(
+				*pptex2D,
+				&Desc_S,
+				ppSRV);
+				
+
+			//创建无序访问资源视图
+			D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+			ZeroMemory(&uavDesc, sizeof(uavDesc));
+			uavDesc.Format = tex_desc.Format;
+			uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+			uavDesc.Texture2D.MipSlice = 0;							//????????????????
+
+			hr = pd3dDevice->CreateUnorderedAccessView(*pptex2D,&uavDesc,ppUAV);
+
+			return hr;
+		}
+
 
 	};
 

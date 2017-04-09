@@ -246,13 +246,13 @@ float4 main(PixelShaderInput_PBR input) : SV_TARGET
 }
 
 
-//吧原始采样着色方程做拆分 第一部分为(求和(L)/N)，也就是入射辐射度，只和环境光贴图相关--------------------------------
+//吧原始采样着色方程做拆分 第一部分为(求和(L)/N)，也就是入射辐射度，只和环境贴图相关
 //UE4中的做法，除了采样环境光，还把基于GGX的pdf放到了预处理里。pdf与n,v有关 输出就是第一部分的求和。由于PDF需要vn,这里假设v=n=r
 float3 PrefilterEnvMap(float roughness, float3 R)
 {
 	float3 N = R;
 	float3 V = R;
-	float3 PrefilteredColor = 0;
+	float3 PrefilteredColor = float3(0.0f, 0.0f, 0.0f);
 	float TotalWeight = 0.0f;
 	const uint NumSamples = 256;
 
@@ -278,23 +278,27 @@ float3 PrefilterEnvMap(float roughness, float3 R)
 	return PrefilteredColor / TotalWeight;
 }
 
-//第二部分是对不同l的f的一个积分 参见论文----------------------------------------------------------------------------------------
+//第二部分是对不同l的f的一个积分 ,详见论文----------------------------------------------------------------------------------------
 //写入纹理图
-float2 IntegrateBRDF(float roughness, float NDotV, float N)
+//由于采样时N为恒定值，因此对于同样的NDotV和roughness函数输出是一致的,因此描述的是各向同性材料
+float2 IntegrateBRDF(float roughness, float NDotV)
 {
 
-	//获得法线坐标系下的V
+	//在法线坐标系下
+	float3 N = float3(0.0f, 0.0f, 1.0f);
+
+	//获得法线坐标系下的V，让V位于y=0的平面内
 	float3 V;
 	V.x = sqrt(1.0f - NDotV * NDotV); // sin
-	V.y = 0;
+	V.y = 0.0f;
 	V.z = NDotV; // cos
-	float A = 0;
-	float B = 0;
-	const uint NumSamples = 1024;
+	float A = 0.0f;
+	float B = 0.0f;
+	const uint NumSamples = 256;
 	for (uint i = 0; i < NumSamples; i++)
 	{
 		float2 Xi = Hammersley(i, NumSamples);
-		float3 H = ImportanceSampleGGX(Xi, roughness, N);			//H这里是世界空间下的，而V是在法线坐标空间下的？？？？？？？？？？？
+		float3 H = ImportanceSampleGGX(Xi, roughness, N);
 		float3 L = 2 * dot(V, H) * H - V;
 		float NDotL = saturate(L.z);
 		float NDotH = saturate(H.z);

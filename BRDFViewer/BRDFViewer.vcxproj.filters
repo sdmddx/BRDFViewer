@@ -51,7 +51,13 @@
     <ClInclude Include="Content\SphereAppMain.h">
       <Filter>头文件\Content</Filter>
     </ClInclude>
-    <ClInclude Include="Content\BP_DS.h">
+    <ClInclude Include="Content\Pref_IS_IBL.h">
+      <Filter>头文件\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\Pref_PBR_DS_IS_IBL.h">
+      <Filter>头文件\Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Content\BP_DS_ML.h">
       <Filter>头文件\Content</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,7 +74,13 @@
     <ClCompile Include="Content\SphereAppMain.cpp">
       <Filter>源文件\Content</Filter>
     </ClCompile>
-    <ClCompile Include="Content\BP_DS.cpp">
+    <ClCompile Include="Content\Pref_IS_IBL.cpp">
+      <Filter>源文件\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\Pref_PBR_DS_IS_IBL.cpp">
+      <Filter>源文件\Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Content\BP_DS_ML.cpp">
       <Filter>源文件\Content</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,10 +119,28 @@
     <FxCompile Include="ShaderResources\Origin_IS_IBL_VS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
-    <FxCompile Include="ShaderResources\BP_DS_PS.hlsl">
+    <FxCompile Include="ShaderResources\Pref_IS_IBL_CS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
-    <FxCompile Include="ShaderResources\BP_DS_VS.hlsl">
+    <FxCompile Include="ShaderResources\SimpleShader_PS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\SimpleShader_VS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\Pref_PBR_DS_IS_IBL_VS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\Pref_PBR_DS_IS_IBL_PS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\Pref_PBR_DS_IS_IBL_CS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\BP_DS_ML_PS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\BP_DS_ML_VS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
   </ItemGroup>

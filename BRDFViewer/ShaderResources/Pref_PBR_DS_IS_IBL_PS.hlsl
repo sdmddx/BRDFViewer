@@ -1,4 +1,3 @@
-
 cbuffer CB_Light : register(b0)
 {
 	float4 baseColor;							//基色
@@ -30,7 +29,7 @@ cbuffer WVP_Inverse:register(b2)
 	matrix view_Inverse;
 	matrix model_Inverse;
 	float4 viewPos;								//模型空间的观察者位置
-								
+
 }
 
 //在窗口大小或投影变换改变时更新
@@ -53,18 +52,6 @@ struct PixelShaderInput_PBR
 	float3 verNor:NORMAL0;
 };
 
-//---------------------------在IBL中使用BRDF着色模型的forward rendering的像素着色器--------------------------------------------------------------- 
-
-cbuffer matInfo:register(b4)
-{
-	float3 diffuse_intensity;
-	float unused0_matInfo;
-	float3 specular_intensity;
-	float unused1_matInfo;
-};
-
-//经CS获得的BRDF LUT 
-Texture2D<float2> tex_IntegrateBRDF:register(t0);
 
 //立方体环境图
 Texture2D cubeMapRight:register(t1);
@@ -74,8 +61,7 @@ Texture2D cubeMapBottom:register(t4);
 Texture2D cubeMapBack:register(t5);
 Texture2D cubeMapFront:register(t6);
 
-SamplerState samLinear:register(s0);
-
+SamplerState samLinear:register(s1);
 //----------------------------------------------------------------------------------------------
 //获得环境贴图要采样的贴图的序号  规定+x -x +y -y +z -z依次为0-5   
 uint GetSampleTexIndex(float3 l)
@@ -183,6 +169,119 @@ float Diffuse_DisneyPrincipledBRDF(float LDotH, float NDotL, float NDotV)
 
 }
 
+//---------------------------在IBL中使用BRDF着色模型的deferred rendering的像素着色器--------------------------------------------------------------- 
+
+//
+
+cbuffer matInfo_albedo_metalness:register(b4)
+{
+	float3 albedo;
+	float metalness;
+};
+
+//经CS获得的BRDF相关的 LUT 
+Texture2D<float2> tex_IntegrateBRDF:register(t0);
+Texture2D tex_w_verNor:register(t7);			//法线纹理
+Texture2D tex_albedometalness:register(t8);		//albedometalness纹理
+
+SamplerState Sampler:register(s0);
+
+//G-Buffer过程-------------------------------------------------------------------------------------------------
+//PS in
+struct VS_OUT_G
+{
+	float4 pos:SV_POSITION;
+	float3 w_verNor:NORMAL0;	//位于世界空间下
+							//float2 tex:TEXCOORD0;
+
+};
+
+//PS out
+struct PS_OUT_G
+{
+	float4 w_verNor:SV_TARGET0;							//存储法线信息
+	float4 albedo_metalness:SV_TARGET1;					//存储反射强度和金属度信息
+};
+
+//G过程PS
+PS_OUT_G PS_G(VS_OUT_G input) :SV_TARGET
+{
+	PS_OUT_G output;
+	output.w_verNor = float4(normalize(input.w_verNor), 0.0f);
+	output.albedo_metalness = float4(albedo, metalness);
+	return output;
+}
+
+//着色过程----------------------------------------------------------------------------------------------------
+//PS in
+struct VS_OUT_S
+{
+	float4 pos:SV_POSITION;
+};
+
+struct PointLightInfo
+{
+	float3 lightPos;
+	float3 lightColor;
+};
+
+//着色过程PS
+float4 PS_S(VS_OUT_S input) :SV_TARGET
+{
+
+	float2 tex = float2(input.pos.x / width,input.pos.y / height);
+	//获得投影空间中的xy坐标
+	float2 posInProj = float2(tex.x*2.0f - 1.0f, -tex.y*2.0f + 1.0f);
+
+	//获得观察空间中的顶点坐标
+	float z = input.pos.w;	//顶点的绝对深度
+	float zMulTanFovAngleY = z*tan(fovAngleY);
+	float4 pos = float4(posInProj.x*aspectRatio*zMulTanFovAngleY, posInProj.y*zMulTanFovAngleY, z, 1.0f);
+
+	//获得世界空间中的顶点坐标
+	pos = mul(pos, view_Inverse);
+
+	//获得模型空间的顶点坐标
+	pos = mul(pos, model_Inverse);
+
+	//采样法线
+	float3 w_verNor = tex_w_verNor.Sample(Sampler,tex).xyz;
+
+	//采样获得albedometalness
+	float4 albedometalness = tex_albedometalness.Sample(Sampler, tex);
+
+	float3 tex_albedo = albedometalness.xyz;
+	float tex_metalness = albedometalness.w;
+	
+	//进行着色过程
+	float3 diffuse = tex_albedo*(1.0f - tex_metalness);
+	float3 specular = float3(0.04f, 0.04f, 0.04f)*(1.0f - tex_metalness) + tex_metalness*tex_albedo;
+
+	float3 n = normalize(w_verNor);
+	float3 v = normalize((viewPos - pos).xyz);
+	float NDotV = dot(n, v);
+	float3 rv = 2 * dot(v, n)*n - v;
+
+	float2 EnvBRDF = tex_IntegrateBRDF.Sample(samLinear, float2(roughness, NDotV));
+
+	float3 sampleColor = GetCubeMapSample(rv);
+	//float3 sampleColor =float3(1.0f,1.0f,0.0f);
+
+	float4 finalcolor = float4(sampleColor*(specular*EnvBRDF.x + EnvBRDF.y)+diffuse, 1.0f);
+
+	return finalcolor;
+	//return float4(rv, 1.0f);
+}
+
+
+//----------------------------------------------------------------------------------------------------------------
+float4 main(VS_OUT_G input) : SV_TARGET
+{
+	return float4(input.w_verNor,1.0f);
+}
+
+
+
 //像素着色器----------------------------------------------------------------------------------
 float4 PS(PixelShaderInput_PBR input) : SV_TARGET
 {
@@ -211,7 +310,7 @@ float4 PS(PixelShaderInput_PBR input) : SV_TARGET
 
 
 
-	return float4(GetCubeMapSample(rv)*(specular_intensity*EnvBRDF.x + EnvBRDF.y), 1.0f);
+	return float4(GetCubeMapSample(rv)*(float3(0.9f,0.9f,0.9f)*EnvBRDF.x + EnvBRDF.y), 1.0f);
 	//return float4(-ViewPos,0.0f);
 }
 

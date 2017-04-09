@@ -33,7 +33,9 @@
 //#include <collection.h>
 
 #include "Content\SphereScene.h"
-#include "Content\BP_DS.h"
+#include "Content\Pref_IS_IBL.h"
+#include "Content\Pref_PBR_DS_IS_IBL.h"
+#include "Content\BP_DS_ML.h"
 #include "Content\SphereAppMain.h"
 
 
