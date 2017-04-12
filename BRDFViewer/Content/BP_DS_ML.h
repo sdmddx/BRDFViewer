@@ -4,12 +4,12 @@
 
 namespace Example
 {
-	class BP_DS :public Scene::SceneBase
+	class BP_DS_ML :public Scene::SceneBase
 	{
 	public:
-		BP_DS(const std::shared_ptr<DX::DXResources>& dxResources);
+		BP_DS_ML(const std::shared_ptr<DX::DXResources>& dxResources);
 
-		~BP_DS();
+		~BP_DS_ML();
 
 		virtual void CreateDeviceDependentResources();
 		virtual void CreateWindowSizeDependentResources();

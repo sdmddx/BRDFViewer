@@ -255,8 +255,7 @@ float4 PS_S(VS_OUT_S input) :SV_TARGET
 	
 	//进行着色过程
 	float3 diffuse = tex_albedo*(1.0f - tex_metalness);
-	float3 specular = float3(0.04f, 0.04f, 0.04f)*(1.0f - tex_metalness) + tex_metalness*tex_albedo;
-
+	float3 specular = lerp(0.04f, tex_albedo, tex_metalness);
 	float3 n = normalize(w_verNor);
 	float3 v = normalize((viewPos - pos).xyz);
 	float NDotV = dot(n, v);
@@ -265,9 +264,9 @@ float4 PS_S(VS_OUT_S input) :SV_TARGET
 	float2 EnvBRDF = tex_IntegrateBRDF.Sample(samLinear, float2(roughness, NDotV));
 
 	float3 sampleColor = GetCubeMapSample(rv);
-	//float3 sampleColor =float3(1.0f,1.0f,0.0f);
+	//float3 sampleColor =float3(1.0f,0.0f,0.0f);
 
-	float4 finalcolor = float4(sampleColor*(specular*EnvBRDF.x + EnvBRDF.y)+diffuse, 1.0f);
+	float4 finalcolor = float4(sampleColor*((specular*EnvBRDF.x + EnvBRDF.y)+diffuse*NDotV), 1.0f);
 
 	return finalcolor;
 	//return float4(rv, 1.0f);

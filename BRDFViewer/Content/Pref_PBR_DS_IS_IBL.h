@@ -164,6 +164,16 @@ namespace Example
 			m_isLButtonDown = false;
 			m_isRButtonDown = false;
 		}
+
+		void SetRoughness(float value)
+		{
+			m_CB_PBR_Data->roughness = value;
+		}
+
+		void Setmetalness(float value)
+		{
+			m_CB_MatInfo_albedo_metalness_Data->metalness = value;
+		}
 	};
 }
 

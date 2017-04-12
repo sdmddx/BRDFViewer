@@ -36,6 +36,7 @@
 #include "Content\Pref_IS_IBL.h"
 #include "Content\Pref_PBR_DS_IS_IBL.h"
 #include "Content\BP_DS_ML.h"
+#include "Content\Origin_PBR_ML.h"
 #include "Content\SphereAppMain.h"
 
 

@@ -65,8 +65,8 @@ struct CB_Light
 
 struct CB_PBR
 {
-	float roughness;		//PBR粗糙度
-	float metalic;			//PBR金属度
+	float roughness;							//PBR粗糙度
+	float metalic;								//PBR金属度
 	float specular;								//第一层镜面反射的强度  取值0.0f到0.08f
 	float specularTint;							//specular是否有颜色  1.0f时为basecolor 0.0f时为无色（定义颜色）
 	float clearCoat;							//第二层镜面反射的强度  取值0.0f到0.25f
@@ -74,10 +74,16 @@ struct CB_PBR
 	float D_GTR_C;								//第一层specularD项GTR模型的调整量c
 	float D_GTR_N;								//第一层specularD项GTR模型的n    通常取值在1.0f到2.0f
 	float anisotropic;							//各向异性
-	float unused2;
-	float unused3;
-	float unused4;
+	XMFLOAT3 baseColor;							//基色
 
+};
+
+struct CB_DFGChoice
+{
+	UINT Dchoice;
+	UINT Fchoice;
+	UINT Gchoice;
+	UINT unused0;
 };
 
 struct CB_MatInfo

@@ -7,7 +7,7 @@
 
 using namespace Example;
 
-BP_DS::BP_DS(const std::shared_ptr<DX::DXResources>& dxResources) :
+BP_DS_ML::BP_DS_ML(const std::shared_ptr<DX::DXResources>& dxResources) :
 	m_dxResources(dxResources),
 	m_loadingComplete(false)
 {
@@ -32,12 +32,12 @@ BP_DS::BP_DS(const std::shared_ptr<DX::DXResources>& dxResources) :
 	m_mouseWheel = 0;
 }
 
-BP_DS::~BP_DS()
+BP_DS_ML::~BP_DS_ML()
 {
 	ReleaseDeviceDependentResources();
 }
 // 当窗口的大小改变时初始化视图参数。
-void BP_DS::CreateWindowSizeDependentResources()
+void BP_DS_ML::CreateWindowSizeDependentResources()
 {
 	Math::Size windowSize = m_dxResources->GetWindowSize();
 	float aspectRatio = float(windowSize.Width) / float(windowSize.Height);
@@ -100,7 +100,7 @@ void BP_DS::CreateWindowSizeDependentResources()
 }
 
 //根据设备对象创建当前场景需要的着色器 模型 纹理 等资源
-void BP_DS::CreateDeviceDependentResources()
+void BP_DS_ML::CreateDeviceDependentResources()
 {
 	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 
@@ -370,7 +370,7 @@ void BP_DS::CreateDeviceDependentResources()
 
 }
 
-void BP_DS::Update(Utilities::StepTimer const& timer)
+void BP_DS_ML::Update(Utilities::StepTimer const& timer)
 {
 	if (m_isLButtonDown)
 	{
@@ -406,7 +406,7 @@ void BP_DS::Update(Utilities::StepTimer const& timer)
 
 }
 
-void BP_DS::ReleaseDeviceDependentResources()
+void BP_DS_ML::ReleaseDeviceDependentResources()
 {
 	m_loadingComplete = false;
 	m_IL_G.Reset();
@@ -434,7 +434,7 @@ void BP_DS::ReleaseDeviceDependentResources()
 }
 
 // 使用顶点和像素着色器呈现一个帧。
-void BP_DS::Render()
+void BP_DS_ML::Render()
 {
 	if (!m_loadingComplete)
 	{

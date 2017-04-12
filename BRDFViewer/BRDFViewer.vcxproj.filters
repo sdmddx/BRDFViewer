@@ -27,7 +27,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
     <Text Include="helper.txt">
       <Filter>着色器资源</Filter>
     </Text>
@@ -60,6 +59,9 @@
     <ClInclude Include="Content\BP_DS_ML.h">
       <Filter>头文件\Content</Filter>
     </ClInclude>
+    <ClInclude Include="Content\Origin_PBR_ML.h">
+      <Filter>头文件\Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -83,6 +85,9 @@
     <ClCompile Include="Content\BP_DS_ML.cpp">
       <Filter>源文件\Content</Filter>
     </ClCompile>
+    <ClCompile Include="Content\Origin_PBR_ML.cpp">
+      <Filter>源文件\Content</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="BRDFViewer.rc">
@@ -101,12 +106,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ShaderResources\VertexShader.hlsl">
-      <Filter>着色器资源</Filter>
-    </FxCompile>
-    <FxCompile Include="ShaderResources\PixelShader.hlsl">
-      <Filter>着色器资源</Filter>
-    </FxCompile>
     <FxCompile Include="ShaderResources\Pref_IS_IBL_VS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
@@ -141,6 +140,12 @@
       <Filter>着色器资源</Filter>
     </FxCompile>
     <FxCompile Include="ShaderResources\BP_DS_ML_VS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\Origin_PBR_ML_VS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\Origin_PBR_ML_PS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
   </ItemGroup>

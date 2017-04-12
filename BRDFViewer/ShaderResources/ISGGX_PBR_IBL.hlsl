@@ -28,26 +28,27 @@ cbuffer CB_PBR : register(b1)
 //D--------------------------------------------------------------------------------------------
 float D_GGX(float roughness, float NDotH)
 {
-	return 0.318f* roughness*roughness / pow(NDotH*NDotH*(roughness*roughness - 1.0f) + 1.0f, 2.0f);
+	float alpha = roughness*roughness;
+	return 0.318f* alpha*alpha / pow(NDotH*NDotH*(alpha*alpha - 1.0f) + 1.0f, 2.0f);
 }
 
 //static float D_GTR_C = 0.25f;
 //static float D_GTR_N = 1.0f;
 
-float D_GTR(float roughness, float NDotH, float D_GTR_C, float D_GTR_N)
+float D_GTR(float roughness, float NDotH)
 {
 	float cosHSqr = NDotH*NDotH;
 	return D_GTR_C / pow((roughness*roughness*cosHSqr + 1.0f - cosHSqr), D_GTR_N);
 }
 
 //F-----------------------------------------------------------------------------------------
-float3 F_Schlick(float specularColor, float LDotH)
+float3 F_Schlick(float3 specularColor, float LDotH)
 {
 	float Fc = pow(1.0f - LDotH, 5.0f);
 	return (1.0f - Fc)*specularColor + Fc;
 }
 
-float3 F_Schlick_SG(float specularColor, float LDotH)
+float3 F_Schlick_SG(float3 specularColor, float LDotH)
 {
 	float Fc = pow(2.0f, (-5.55473f*LDotH - 6.98316f)*LDotH);
 	return  (1.0f - Fc)*specularColor + Fc;
@@ -57,19 +58,19 @@ float3 F_Schlick_SG(float specularColor, float LDotH)
 float G_Schlick(float roughness, float NDotL, float NDotV)
 {
 	float k = pow((roughness + 1.0f), 2.0f) / 8.0f;
-	//float Gl = 1.0f / (1.0f + k + k / NDotL);
-	//float Gv = 1.0f / (1.0f + k + k / NDotV);
-	return 1.0f / (1.0f + k + k / NDotL) / (1.0f + k + k / NDotV);
+	//float Gl = 1.0f / (1.0f - k + k / NDotL);
+	//float Gv = 1.0f / (1.0f - k + k / NDotV);
+	return 1.0f / (1.0f - k + k / NDotL) / (1.0f - k + k / NDotV);
 }
 
 //BRDF的specular分量---------------------------------------------------------------------------
-float3 Specular_BRDF(float roughness, float LDotH, float NDotH, float NDotL, float NDotV, float specularColor)
+float3 Specular_BRDF(float roughness, float LDotH, float NDotH, float NDotL, float NDotV, float3 specularColor)
 {
 
 	return D_GGX(roughness, NDotH)*F_Schlick_SG(specularColor, LDotH)*G_Schlick(roughness, NDotL, NDotV) / (4.0f*NDotL*NDotV) + specular;
 }
 
-float3 Specular_2_BRDF(float LDotH, float NDotH, float NDotL, float NDotV, float specularColor)
+float3 Specular_2_BRDF(float LDotH, float NDotH, float NDotL, float NDotV, float3 specularColor)
 {
 	return D_GGX(clearCoatGloss, NDotH)*G_Schlick(0.25f, NDotL, NDotV) / (4.0f*NDotL*NDotV) + clearCoat;		//F项？？？
 }

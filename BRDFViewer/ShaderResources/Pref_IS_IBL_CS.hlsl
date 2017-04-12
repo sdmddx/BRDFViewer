@@ -3,9 +3,9 @@
 float G_Schlick(float roughness, float NDotL, float NDotV)
 {
 	float k = pow((roughness + 1.0f), 2.0f) / 8.0f;
-	//float Gl = 1.0f / (1.0f + k + k / NDotL);
-	//float Gv = 1.0f / (1.0f + k + k / NDotV);
-	return 1.0f / (1.0f + k + k / NDotL) / (1.0f + k + k / NDotV);
+	//float Gl = 1.0f / (1.0f - k + k / NDotL);
+	//float Gv = 1.0f / (1.0f - k + k / NDotV);
+	return 1.0f / (1.0f - k + k / NDotL) / (1.0f - k + k / NDotV);
 }
 
 //Hammersley采样------------------------------------------------------------------------------
@@ -51,6 +51,7 @@ float3 ImportanceSampleGGX(float2 Xi, float roughness, float3 N)
 
 }
 
+//由于采样时N为恒定值，因此对于同样的NDotV和roughness函数输出是一致的,因此描述的是各向同性材料
 float2 IntegrateBRDF(float roughness, float NDotV)
 {
 

@@ -3,9 +3,9 @@
 float G_Schlick(float roughness, float NDotL, float NDotV)
 {
 	float k = pow((roughness + 1.0f), 2.0f) / 8.0f;
-	//float Gl = 1.0f / (1.0f + k + k / NDotL);
-	//float Gv = 1.0f / (1.0f + k + k / NDotV);
-	return 1.0f / (1.0f + k + k / NDotL) / (1.0f + k + k / NDotV);
+	//float Gl = 1.0f / (1.0f - k + k / NDotL);
+	//float Gv = 1.0f / (1.0f - k + k / NDotV);
+	return 1.0f / (1.0f - k + k / NDotL) / (1.0f - k + k / NDotV);
 }
 
 //Hammersley²ÉÑù------------------------------------------------------------------------------

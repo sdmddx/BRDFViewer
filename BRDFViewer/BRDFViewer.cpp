@@ -3,18 +3,25 @@
 
 #include "stdafx.h"
 
-
+#include "commctrl.h"
 
 #include "BRDFViewer.h"
 
-shared_ptr<Example::BP_DS> sphereScene;
-
+using namespace std;
+shared_ptr<Example::Origin_PBR_ML_Scene> sphereScene;
+shared_ptr<App::WindowCreator> window0;
+int ncmdShow;
 // 全局变量: 
-HINSTANCE hInst;                                // 当前实例
+HINSTANCE hInst;    
+
+HWND hdlg;
+// 当前实例
 
 // 此代码模块中包含的函数的前向声明: 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK    WndProc0(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    About0(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -23,7 +30,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
+	ncmdShow = nCmdShow;
     // TODO: 在此放置代码。
 	using namespace std;
 
@@ -31,6 +38,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // 初始化全局字符串
 	window->MyRegisterClass(WndProc);
+
+	//注册其他子窗口
+	window0 = shared_ptr<App::WindowCreator>(new App::WindowCreator(hInstance, nCmdShow));
+	window0->MyRegisterClass(WndProc0);
 
     // 执行应用程序初始化: 
     if (!window->InitInstance())
@@ -44,7 +55,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	unique_ptr<Example::SphereAppMain> main = unique_ptr<Example::SphereAppMain>(new Example::SphereAppMain(dxResources));
 
 	//创建一个场景
-	sphereScene = shared_ptr<Example::BP_DS>(new Example::BP_DS(dxResources));
+	sphereScene = shared_ptr<Example::Origin_PBR_ML_Scene>(new Example::Origin_PBR_ML_Scene(dxResources));
 
 	main->GetScene(sphereScene);
 
@@ -64,6 +75,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			
         }
 		main->StartRenderLoop();
+		//ShowWindow(hButton, nCmdShow);
+		//UpdateWindow(hButton);
     }
 
     return (int) msg.wParam;
@@ -95,11 +108,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
+			case ID_32772:
+			{
+				
+				HWND h= CreateDialog(hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, About0);
+				ShowWindow(h, SW_SHOWNA);
+			}
+			break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
         }
         break;
+
+	case WM_CREATE:
+	{
+		// 创建对话框  
+		//HWND hDlg0 = CreateDialog(hInst, MAKEINTRESOURCE(IDD_FORMVIEW), hWnd, nullptr);
+		// 显示对话框  
+		//ShowWindow(hDlg0, SW_SHOWNA);
+	}
+	
+	break;
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
@@ -201,6 +231,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+LRESULT CALLBACK WndProc0(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+		case WM_COMMAND:
+		{
+
+		}
+		break;
+	}
+	return 0;
+}
+
 // “关于”框的消息处理程序。
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -219,4 +262,161 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+// “关于”框的消息处理程序。
+INT_PTR CALLBACK About0(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+	{
+		// 获取当前实例句柄  
+		HINSTANCE hinst = (HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE);
+		
+		//创建DFG选择的combo box
+		HWND specularD = CreateWindow(L"combobox", L"specular D", WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS,
+			10, 10, 120, 100, hDlg, (HMENU)IDC_COMBOD, hinst, NULL);
+		SendMessage(specularD, CB_INSERTSTRING, 0, (LPARAM)TEXT("GGX/Trowbridge-Reitz"));
+		SendMessage(specularD, CB_INSERTSTRING, 1, (LPARAM)TEXT("Generalized-Trowbridge-Reitz"));
+		SendMessage(specularD, CB_SETCURSEL, 0, 0);
+
+		HWND specularF = CreateWindow(L"combobox", L"specular F", WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS,
+			150, 10, 120, 100, hDlg, (HMENU)IDC_COMBOF, hinst, NULL);
+		SendMessage(specularF, CB_INSERTSTRING, 0, (LPARAM)TEXT("Schlick"));
+		SendMessage(specularF, CB_INSERTSTRING, 1, (LPARAM)TEXT("Schlick_SG"));
+		SendMessage(specularF, CB_SETCURSEL, 0, 0);
+
+		HWND specularG = CreateWindow(L"combobox", L"specular G", WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS,
+			290, 10, 120, 100, hDlg, (HMENU)IDC_COMBOG, hinst, NULL);
+		SendMessage(specularG, CB_INSERTSTRING, 0, (LPARAM)TEXT("Schlick"));
+		SendMessage(specularG, CB_SETCURSEL, 0, 0);
+
+		//设置漫反射率的slider
+		SendMessage(GetDlgItem(hDlg, IDC_DIFFUSE_X), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_DIFFUSE_X), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_DIFFUSE_Y), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_DIFFUSE_Y), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_DIFFUSE_Z), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_DIFFUSE_Z), TBM_SETPOS, TRUE, 0);
+
+		//设置镜面反射率的slider
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULAR_X), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULAR_X), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULAR_Y), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULAR_Y), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULAR_Z), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULAR_Z), TBM_SETPOS, TRUE, 0);
+
+		//设置basecolor的Slider
+		SendMessage(GetDlgItem(hDlg, IDC_BASECOLOR_X), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_BASECOLOR_X), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_BASECOLOR_Y), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_BASECOLOR_Y), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_BASECOLOR_Z), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_BASECOLOR_Z), TBM_SETPOS, TRUE, 0);
+
+		//设置PBR相关的Slider
+		SendMessage(GetDlgItem(hDlg, IDC_ROUGHNESS), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_ROUGHNESS), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_METALLIC), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_METALLIC), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULAR), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULAR), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULARTINT), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_SPECULARTINT), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_CLEARCOAT), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_CLEARCOAT), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_CLEARCOATGLOSS), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_CLEARCOATGLOSS), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_ANISOTROPIC), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_ANISOTROPIC), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_DGTRC), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_DGTRC), TBM_SETPOS, TRUE, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_DGTRN), TBM_SETRANGE, TRUE, (LPARAM)MAKELONG(0, 255));
+		SendMessage(GetDlgItem(hDlg, IDC_DGTRN), TBM_SETPOS, TRUE, 0);
+
+		//静态文本
+		HWND hwnd_di = CreateWindow(TEXT("STATIC"), TEXT("diffuse强度"), WS_CHILD | WS_VISIBLE | SS_LEFT, 
+			10, 40, 85, 15, hDlg, (HMENU)IDC_DIFFUSEINTENSITY, hinst, NULL);
+		SendMessage(hwnd_di, WM_SETFONT, (WPARAM)GetStockObject(17), 0);
+		HWND hwnd_si = CreateWindow(TEXT("STATIC"), TEXT("specular强度"), WS_CHILD | WS_VISIBLE | SS_LEFT, 
+			10, 180,90, 15, hDlg, (HMENU)IDC_SPECULARINTENSITY, hinst, NULL);
+		SendMessage(hwnd_si, WM_SETFONT, (WPARAM)GetStockObject(17), 0);
+		HWND hwnd_baseColor = CreateWindow(TEXT("STATIC"), TEXT("baseColor"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			10, 320, 90, 15, hDlg, (HMENU)IDC_SPECULARINTENSITY, hinst, NULL);
+		SendMessage(hwnd_baseColor, WM_SETFONT, (WPARAM)GetStockObject(17), 0);
+		UINT posX = 172;
+		UINT posFirstY = 70;
+		UINT distanceY = 33;
+		CreateWindow(TEXT("STATIC"), TEXT("roughness"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY, 80, 15, hDlg,nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("metallic"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY += distanceY, 80, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("specular"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY += distanceY, 80, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("specularTint"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY += distanceY, 80, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("clearCoat"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY += distanceY, 80, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("clearCoatGloss"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY += distanceY, 100, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("anisotropic"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY += distanceY, 80, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("D_GTR_C"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY += distanceY, 80, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("D_GTR_N"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			posX, posFirstY += distanceY, 80, 15, hDlg, nullptr, hinst, NULL);
+		/*
+		HWND edit1 = CreateWindow(TEXT("Edit"), TEXT("Edit Control"), WS_CHILD | WS_VISIBLE | ES_LEFT, 
+			200, 260, 100, 20, hDlg, (HMENU)IDC_EDIT1, hinst, NULL);
+		SendMessage(edit1, WM_SETFONT, (WPARAM)GetStockObject(17), 0);
+
+		// 获取当前实例句柄  
+		HINSTANCE hthisapp = (HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE);
+		CreateWindow(L"SCROLLBAR", L"请问你的性别是：",
+			 WS_CHILD | WS_VISIBLE,
+			10, 10, 160, 18,
+			hDlg, (HMENU)IDC_SLIDER1,
+			hthisapp,
+			&lParam);
+		CreateWindow(L"Button", L"男",
+			WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON | WS_GROUP,
+			12, 12, 60, 16,
+			hDlg,
+			(HMENU)IDC_SLIDER1,
+			hthisapp, NULL);
+		*/
+
+	}
+		return (INT_PTR)TRUE;
+	case WM_HSCROLL:
+	{
+		sphereScene->ProcessHSCROLL(wParam, lParam);
+
+	}
+	return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+	{
+		sphereScene->ProcessCommand(wParam, lParam);
+		
+
+	}		
+	break;
+
+	case WM_SYSCOMMAND:
+		if (wParam == SC_CLOSE)
+		{
+			// 如果执行了关闭  
+			// 销毁对话框，将收到WM_DESTROY消息  
+			EndDialog(hDlg, LOWORD(wParam));
+		}
+		break;
+	case WM_CREATE:
+		
+		break;
+	}
+	return (INT_PTR)FALSE;
 }

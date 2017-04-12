@@ -81,7 +81,7 @@ float Lambert(float3 l, float3 n)
 }
 
 //Phong模型
-const uniform float ex_Phong = 2.0f;
+static const float ex_Phong = 2.0f;
 float Phong(float3 l, float3 n, float3 v)
 {
 	return pow(max((2 * dot(l, n)*n - l)*v,0.0000001), ex_Phong);
@@ -115,8 +115,8 @@ float4 PS_S(VS_OUT_S input):SV_TARGET
 
 	//进行光照计算 
 	
-	float colorDiffuse = (0.0f, 0.0f, 0.0f);
-	float colorSpecular = (0.0f, 0.0f, 0.0f);
+	float3 colorDiffuse = (0.0f, 0.0f, 0.0f);
+	float3 colorSpecular = (0.0f, 0.0f, 0.0f);
 
 	float numDiffuse = 0;
 	float numSpecular = 0;
@@ -148,7 +148,7 @@ float4 PS_S(VS_OUT_S input):SV_TARGET
 	numSpecular = max(numSpecular, 1);
 	float3 color = (colorDiffuse / numDiffuse + colorSpecular / numSpecular);
 
-	return float4(color,0.0f);
+	return saturate(float4(color,0.0f));
 
 	
 
