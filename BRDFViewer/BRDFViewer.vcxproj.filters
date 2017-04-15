@@ -148,6 +148,12 @@
     <FxCompile Include="ShaderResources\Origin_PBR_ML_PS.hlsl">
       <Filter>着色器资源</Filter>
     </FxCompile>
+    <FxCompile Include="ShaderResources\SphereScene_PS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
+    <FxCompile Include="ShaderResources\SphereScene_VS.hlsl">
+      <Filter>着色器资源</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderResources\ISGGX_PBR_IBL.hlsl">

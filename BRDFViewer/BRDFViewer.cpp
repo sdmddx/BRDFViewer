@@ -8,7 +8,7 @@
 #include "BRDFViewer.h"
 
 using namespace std;
-shared_ptr<Example::Origin_PBR_ML_Scene> sphereScene;
+shared_ptr<Example::SphereScene> sphereScene;
 shared_ptr<App::WindowCreator> window0;
 int ncmdShow;
 // 全局变量: 
@@ -55,7 +55,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	unique_ptr<Example::SphereAppMain> main = unique_ptr<Example::SphereAppMain>(new Example::SphereAppMain(dxResources));
 
 	//创建一个场景
-	sphereScene = shared_ptr<Example::Origin_PBR_ML_Scene>(new Example::Origin_PBR_ML_Scene(dxResources));
+	sphereScene = shared_ptr<Example::SphereScene>(new Example::SphereScene(dxResources));
 
 	main->GetScene(sphereScene);
 

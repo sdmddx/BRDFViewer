@@ -5,7 +5,7 @@
 #include "resource.h"
 namespace Example
 {
-	class Origin_PBR_ML_Scene :public Scene::SceneBase
+	class Origin_PBR_ML_Scene :public Scene::SceneBase, public Utilities::MessageProcessor
 	{
 	public:
 		Origin_PBR_ML_Scene(const std::shared_ptr<DX::DXResources>& dxResources);

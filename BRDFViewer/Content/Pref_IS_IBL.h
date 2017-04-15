@@ -4,7 +4,7 @@
 
 namespace Example
 {
-	class Pref_IS_IBL_Scene :public Scene::SceneBase
+	class Pref_IS_IBL_Scene :public Scene::SceneBase, public Utilities::MessageProcessor
 	{
 	private:
 		//使用CS收集BRDF

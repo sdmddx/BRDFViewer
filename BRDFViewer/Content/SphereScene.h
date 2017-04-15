@@ -4,7 +4,7 @@
 
 namespace Example
 {
-	class SphereScene :public Scene::SceneBase
+	class SphereScene :public Scene::SceneBase,public Utilities::MessageProcessor
 	{
 	public:
 		SphereScene(const std::shared_ptr<DX::DXResources>& dxResources);
@@ -29,25 +29,19 @@ namespace Example
 		Microsoft::WRL::ComPtr<ID3D11VertexShader>				m_vertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader>				m_pixelShader;
 		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_WVP;
-		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_PBR;
 		Microsoft::WRL::ComPtr<ID3D11Buffer>					m_D3D_CB_Light;
 
-		//环境图SRV
-		ID3D11ShaderResourceView*								m_SRV_envMap;
-		ID3D11ShaderResourceView*								m_cubeMap[6];
 
 		Microsoft::WRL::ComPtr<ID3D11SamplerState>				sampler;
 
 		unique_ptr<Utilities::SdmCamera>						m_camera;
 
 		unique_ptr<Utilities::ShaderLoader>						m_shaderLoader;
-
 		
 		UINT32	m_indexCount;
 
 		//常量缓冲区
 		unique_ptr<CB_WVP>										m_CB_WVP_Data;
-		unique_ptr<CB_PBR>										m_CB_PBR_Data;
 		unique_ptr<CB_Light>									m_CB_Light_Data;
 
 		//世界变换矩阵的逆矩阵
@@ -63,7 +57,7 @@ namespace Example
 		Math::Point m_leftPointMovement;		//在鼠标左键按下时记录移动鼠标后的更新位置
 		Math::Point m_rightPoint;				//跟踪鼠标右键按下时所在位置，该位置在调用一次update()方法后会更新至最新位置
 		Math::Point m_rightPointMovement;		//在鼠标右键按下时记录移动鼠标后的更新位置
-		SHORT m_mouseWheel;			//记录鼠标滑轮滚动delta
+		SHORT m_mouseWheel;						//记录鼠标滑轮滚动delta
 			
 	public:
 		//相机变换相应的事件
@@ -123,6 +117,8 @@ namespace Example
 			m_isLButtonDown = false;
 			m_isRButtonDown = false;
 		}
+
+
 	};
 }
 

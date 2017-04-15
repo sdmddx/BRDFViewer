@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "SphereScene.h"
 #include <vector>
 #include <d3dx11async.h>
 #include <d3dcompiler.h>
@@ -15,7 +16,6 @@ SphereScene::SphereScene(const std::shared_ptr<DX::DXResources>& dxResources) :
 	m_shaderLoader = unique_ptr<Utilities::ShaderLoader>(new Utilities::ShaderLoader(dxResources));
 
 	m_CB_WVP_Data = make_unique<CB_WVP>();
-	m_CB_PBR_Data = make_unique<CB_PBR>();
 	m_CB_Light_Data = make_unique<CB_Light>();
 
 	CreateWindowSizeDependentResources();
@@ -81,20 +81,11 @@ void SphereScene::CreateWindowSizeDependentResources()
 	XMVECTOR deter;
 	model_inverse = XMMatrixInverse(&deter, model);
 	//XMVECTOR lightPos = eye;
-	XMVECTOR lightPos = XMVectorSet(2.0f, 2.0f, -2.0f, 1.0f);
+	XMVECTOR lightPos = XMVectorSet(-2.0f, 0.0f, -2.0f, 1.0f);
 
 	XMStoreFloat3(&m_CB_Light_Data->lightPos, XMVector4Transform(lightPos, model_inverse));
 	m_CB_Light_Data->baseColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	//XMStoreFloat3(&m_CB_Light_Data->viewPos, XMVector4Transform(XMLoadFloat4(&m_camera->GetEye()), model_inverse));
-	m_CB_PBR_Data->roughness = 0.2f;
-	m_CB_PBR_Data->metalic = 0.7f;
-	m_CB_PBR_Data->specular = 0.08f;
-	m_CB_PBR_Data->specularTint = 1.0f;
-	m_CB_PBR_Data->clearCoat = 0.25f;
-	m_CB_PBR_Data->clearCoatGloss = 0.5f;
-	m_CB_PBR_Data->D_GTR_N = 2.0f;
-	m_CB_PBR_Data->D_GTR_C = 0.25f;
-	m_CB_PBR_Data->anisotropic = 1.0f;
+	XMStoreFloat3(&m_CB_Light_Data->viewPos, XMVector4Transform(XMLoadFloat4(&m_camera->GetEye()), model_inverse));
 
 }
 
@@ -116,17 +107,17 @@ void SphereScene::CreateDeviceDependentResources()
 	static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "VERNOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 
 	};
 	
-	hr = m_shaderLoader->CreateVertexShader_IA(L"ShaderResources\\Pref_IS_IBL_VS.hlsl", "VS", "vs_5_0",
+	hr = m_shaderLoader->CreateVertexShader_IA(L"ShaderResources\\SphereScene_VS.hlsl", "VS", "vs_5_0",
 		m_vertexShader, 
 		vertexDesc,
 		ARRAYSIZE(vertexDesc),
 		m_inputLayout);
 
-	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\Pref_IS_IBL_PS.hlsl", "main", "ps_5_0",
+	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\SphereScene_PS.hlsl", "PS_AnisotropicWard", "ps_5_0",
 		m_pixelShader);
 
 	CD3D11_BUFFER_DESC CB_MCP_Desc(sizeof(CB_MVP), D3D11_BIND_CONSTANT_BUFFER);
@@ -142,14 +133,6 @@ void SphereScene::CreateDeviceDependentResources()
 			&constantBufferDesc_Light,
 			nullptr,
 			&m_D3D_CB_Light
-		
-	);
-
-	CD3D11_BUFFER_DESC constantBufferDesc_PBR(sizeof(CB_PBR), D3D11_BIND_CONSTANT_BUFFER);
-		m_dxResources->GetD3DDevice()->CreateBuffer(
-			&constantBufferDesc_PBR,
-			nullptr,
-			&m_D3D_CB_PBR
 		
 	);
 
@@ -228,16 +211,7 @@ void SphereScene::CreateDeviceDependentResources()
 	
 	// 加载立方体后，就可以呈现该对象了。
 
-	hr = D3DX11CreateShaderResourceViewFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\right.jpg", NULL, 0, &m_cubeMap[0], 0);
-	hr = D3DX11CreateShaderResourceViewFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\left.jpg", NULL, 0, &m_cubeMap[1], 0);
-	hr = D3DX11CreateShaderResourceViewFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\top.jpg", NULL, 0, &m_cubeMap[2], 0);
-	hr = D3DX11CreateShaderResourceViewFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\bottom.jpg", NULL, 0, &m_cubeMap[3], 0);
-	hr = D3DX11CreateShaderResourceViewFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\back.jpg", NULL, 0, &m_cubeMap[4], 0);
-	hr = D3DX11CreateShaderResourceViewFromFile(m_dxResources->GetD3DDevice(), L"TextureResources\\front.jpg", NULL, 0, &m_cubeMap[5], 0);
-
 	
-	//绑定像素着色器资源
-	m_dxResources->GetD3DDeviceContext()->PSSetShaderResources(1, 6, &m_cubeMap[0]);
 
 	Microsoft::WRL::ComPtr<IWICBitmapDecoder> m_wicDecoder = NULL;
 
@@ -289,7 +263,6 @@ void SphereScene::CreateDeviceDependentResources()
 	tex_desc.Usage = D3D11_USAGE_DEFAULT;
 
 	D3D11_SUBRESOURCE_DATA sr;
-	//sr.pSysMem= m_fileBitmap->
 	sr.pSysMem = buffer.get();
 	sr.SysMemPitch = width*4;
 	sr.SysMemSlicePitch = 0; // Not needed since this is a 2d texture
@@ -297,24 +270,6 @@ void SphereScene::CreateDeviceDependentResources()
 	Microsoft::WRL::ComPtr<ID3D11Texture2D>         image_texture;
 	hr = m_dxResources->GetD3DDevice()->CreateTexture2D(&tex_desc, &sr, &image_texture);
 
-	// Once the texture is created, we must create a shader resource view of it
-	// so that shaders may use it.  In general, the view description will match
-	// the texture description.
-	D3D11_SHADER_RESOURCE_VIEW_DESC tVDesc;
-	ZeroMemory(&tVDesc, sizeof(tVDesc));
-	tVDesc.Format = tex_desc.Format;
-	tVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	tVDesc.Texture2D.MipLevels = tex_desc.MipLevels;
-	tVDesc.Texture2D.MostDetailedMip = 0;
-
-
-	hr = m_dxResources->GetD3DDevice()->CreateShaderResourceView(
-		image_texture.Get(),
-			&tVDesc,
-			&m_SRV_envMap);
-
-	//绑定像素着色器资源
-	m_dxResources->GetD3DDeviceContext()->PSSetShaderResources(0, 1, &m_SRV_envMap);
 
 	//设置采样器状态
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -402,14 +357,11 @@ void SphereScene::ReleaseDeviceDependentResources()
 	m_inputLayout.Reset();
 	m_pixelShader.Reset();
 	m_D3D_CB_WVP.Reset();
-	m_D3D_CB_PBR.Reset();
 	m_D3D_CB_Light.Reset();
 	m_vertexBuffer.Reset();
 	m_indexBuffer.Reset();
 
-	sampler.Reset();
-	m_SRV_envMap->Release();
-	
+	sampler.Reset();	
 }
 
 // 使用顶点和像素着色器呈现一个帧。
@@ -429,7 +381,8 @@ void SphereScene::Render()
 	context->OMSetRenderTargets(1, targets, m_dxResources->GetDepthStencilView());
 
 	// 清除后台缓冲区和深度模具视图。
-	context->ClearRenderTargetView(m_dxResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
+	FLOAT color[4]{ 0.22f,0.4f,0.35f,1.0f };
+	context->ClearRenderTargetView(m_dxResources->GetBackBufferRenderTargetView(), color);
 	context->ClearDepthStencilView(m_dxResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// 准备常量缓冲区以将其发送到图形设备。
@@ -444,10 +397,6 @@ void SphereScene::Render()
 
 	context->UpdateSubresource(
 		m_D3D_CB_Light.Get(), 0, NULL, m_CB_Light_Data.get(), 0, 0
-	);
-
-	context->UpdateSubresource(
-		m_D3D_CB_PBR.Get(), 0, NULL, m_CB_PBR_Data.get(), 0, 0
 	);
 
 	// 每个顶点都是 VertexPositionColor 结构的一个实例。
@@ -492,9 +441,6 @@ void SphereScene::Render()
 		0, 1, m_D3D_CB_Light.GetAddressOf()
 	);
 
-	context->PSSetConstantBuffers(
-		1, 1, m_D3D_CB_PBR.GetAddressOf()
-	);
 
 	// 附加我们的像素着色器。
 	context->PSSetShader(

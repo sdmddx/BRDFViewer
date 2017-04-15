@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include <vector>
 #include <d3dx11async.h>
 #include <d3dcompiler.h>

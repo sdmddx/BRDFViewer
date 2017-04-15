@@ -18,6 +18,7 @@
 #include "DXDevice\DirectXHelper.h"
 #include "DXDevice\DXResources.h"
 
+#include "Utilities\MessageProcessor.h"
 #include "Utilities\StepTimer.h"
 #include "Utilities\ShaderStructure.h"
 #include "Utilities\ShaderLoader.h"

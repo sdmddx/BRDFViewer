@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+
 #include "Common\Common\Common.h"
 
 using namespace Example;

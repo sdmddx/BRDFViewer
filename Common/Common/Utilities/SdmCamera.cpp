@@ -18,13 +18,13 @@ SdmCamera::SdmCamera(const XMVECTOR& eye, const XMVECTOR& at, const XMVECTOR& up
 	mView = XMMatrixLookAtRH(XMLoadFloat4(&mEye), XMLoadFloat4(&mAt), XMLoadFloat4(&mNorUp));
 }
 
-XMMATRIX& SdmCamera::GetView()
+XMMATRIX SdmCamera::GetView()
 {
 	mView = XMMatrixLookAtLH(XMLoadFloat4(&mEye), XMLoadFloat4(&mAt), XMLoadFloat4(&mNorUp));
 	return mView;
 }
 
- XMMATRIX& SdmCamera::GetInverseView()
+ XMMATRIX SdmCamera::GetInverseView()
 {
 	mView = XMMatrixLookAtLH(XMLoadFloat4(&mEye), XMLoadFloat4(&mAt), XMLoadFloat4(&mNorUp));
 	XMVECTOR deter;
@@ -109,7 +109,7 @@ void SdmCamera::TransformModeG(XMFLOAT4 focus)
 
 }
 
-XMFLOAT4& SdmCamera::GetEye()
+XMFLOAT4 SdmCamera::GetEye()
 {
 	return mEye;
 }

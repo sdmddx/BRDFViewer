@@ -4,7 +4,7 @@
 
 namespace Example
 {
-	class BP_DS_ML :public Scene::SceneBase
+	class BP_DS_ML :public Scene::SceneBase, public Utilities::MessageProcessor
 	{
 	public:
 		BP_DS_ML(const std::shared_ptr<DX::DXResources>& dxResources);
