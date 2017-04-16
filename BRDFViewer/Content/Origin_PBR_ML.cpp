@@ -138,7 +138,7 @@ void Origin_PBR_ML_Scene::CreateDeviceDependentResources()
 		ARRAYSIZE(vertexDesc),
 		m_inputLayout);
 
-	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\Origin_PBR_ML_PS.hlsl", "main", "ps_5_0",
+	hr = m_shaderLoader->CreatePixelShader(L"ShaderResources\\Origin_PBR_ML_PS.hlsl", "PS", "ps_5_0",
 		m_pixelShader);
 
 	CD3D11_BUFFER_DESC CB_MVP_Desc(sizeof(CB_MVP), D3D11_BIND_CONSTANT_BUFFER);
@@ -338,7 +338,8 @@ void Origin_PBR_ML_Scene::Render()
 	context->OMSetRenderTargets(1, targets, m_dxResources->GetDepthStencilView());
 
 	// 清除后台缓冲区和深度模具视图。
-	context->ClearRenderTargetView(m_dxResources->GetBackBufferRenderTargetView(), DirectX::Colors::CornflowerBlue);
+	FLOAT color[4]{ 0.22f,0.4f,0.35f,1.0f };
+	context->ClearRenderTargetView(m_dxResources->GetBackBufferRenderTargetView(), color);
 	context->ClearDepthStencilView(m_dxResources->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// 准备常量缓冲区以将其发送到图形设备。

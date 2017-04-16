@@ -8,8 +8,7 @@
 #include "BRDFViewer.h"
 
 using namespace std;
-shared_ptr<Example::SphereScene> sphereScene;
-shared_ptr<App::WindowCreator> window0;
+shared_ptr<Example::Origin_PBR_ML_Scene> sphereScene;
 int ncmdShow;
 // 全局变量: 
 HINSTANCE hInst;    
@@ -19,7 +18,6 @@ HWND hdlg;
 
 // 此代码模块中包含的函数的前向声明: 
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK    WndProc0(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About0(HWND, UINT, WPARAM, LPARAM);
 
@@ -39,10 +37,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // 初始化全局字符串
 	window->MyRegisterClass(WndProc);
 
-	//注册其他子窗口
-	window0 = shared_ptr<App::WindowCreator>(new App::WindowCreator(hInstance, nCmdShow));
-	window0->MyRegisterClass(WndProc0);
-
     // 执行应用程序初始化: 
     if (!window->InitInstance())
     {
@@ -55,7 +49,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	unique_ptr<Example::SphereAppMain> main = unique_ptr<Example::SphereAppMain>(new Example::SphereAppMain(dxResources));
 
 	//创建一个场景
-	sphereScene = shared_ptr<Example::SphereScene>(new Example::SphereScene(dxResources));
+	sphereScene = shared_ptr<Example::Origin_PBR_ML_Scene>(new Example::Origin_PBR_ML_Scene(dxResources));
 
 	main->GetScene(sphereScene);
 
@@ -231,19 +225,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-LRESULT CALLBACK WndProc0(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-		case WM_COMMAND:
-		{
-
-		}
-		break;
-	}
-	return 0;
-}
-
 // “关于”框的消息处理程序。
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -277,20 +258,37 @@ INT_PTR CALLBACK About0(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		
 		//创建DFG选择的combo box
 		HWND specularD = CreateWindow(L"combobox", L"specular D", WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS,
-			10, 10, 120, 100, hDlg, (HMENU)IDC_COMBOD, hinst, NULL);
+			30, 10, 120, 100, hDlg, (HMENU)IDC_COMBOD, hinst, NULL);
 		SendMessage(specularD, CB_INSERTSTRING, 0, (LPARAM)TEXT("GGX/Trowbridge-Reitz"));
-		SendMessage(specularD, CB_INSERTSTRING, 1, (LPARAM)TEXT("Generalized-Trowbridge-Reitz"));
+		SendMessage(specularD, CB_INSERTSTRING, 1, (LPARAM)TEXT("GTR(Generalized-Trowbridge-Reitz)"));
+		SendMessage(specularD, CB_INSERTSTRING, 2, (LPARAM)TEXT("Bling-Phong"));
+		SendMessage(specularD, CB_INSERTSTRING, 3, (LPARAM)TEXT("UE中的Bling-Phong"));
+		SendMessage(specularD, CB_INSERTSTRING, 4, (LPARAM)TEXT("Beckmann"));
+		SendMessage(specularD, CB_INSERTSTRING, 5, (LPARAM)TEXT("Phong"));
+		SendMessage(specularD, CB_INSERTSTRING, 6, (LPARAM)TEXT("各向异性GGX"));
 		SendMessage(specularD, CB_SETCURSEL, 0, 0);
 
 		HWND specularF = CreateWindow(L"combobox", L"specular F", WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS,
-			150, 10, 120, 100, hDlg, (HMENU)IDC_COMBOF, hinst, NULL);
+			180, 10, 120, 100, hDlg, (HMENU)IDC_COMBOF, hinst, NULL);
 		SendMessage(specularF, CB_INSERTSTRING, 0, (LPARAM)TEXT("Schlick"));
 		SendMessage(specularF, CB_INSERTSTRING, 1, (LPARAM)TEXT("Schlick_SG"));
+		SendMessage(specularF, CB_INSERTSTRING, 2, (LPARAM)TEXT("Cook-Torrance"));
 		SendMessage(specularF, CB_SETCURSEL, 0, 0);
 
 		HWND specularG = CreateWindow(L"combobox", L"specular G", WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS,
-			290, 10, 120, 100, hDlg, (HMENU)IDC_COMBOG, hinst, NULL);
+			330, 10, 120, 100, hDlg, (HMENU)IDC_COMBOG, hinst, NULL);
 		SendMessage(specularG, CB_INSERTSTRING, 0, (LPARAM)TEXT("Schlick"));
+		SendMessage(specularG, CB_INSERTSTRING, 1, (LPARAM)TEXT("Neumann"));
+		SendMessage(specularG, CB_INSERTSTRING, 2, (LPARAM)TEXT("Cook-Torrance"));
+		SendMessage(specularG, CB_INSERTSTRING, 3, (LPARAM)TEXT("Kelemen"));
+		SendMessage(specularG, CB_INSERTSTRING, 4, (LPARAM)TEXT("经典Schlick"));
+		SendMessage(specularG, CB_INSERTSTRING, 5, (LPARAM)TEXT("Schlick-Beckmann"));
+		SendMessage(specularG, CB_INSERTSTRING, 6, (LPARAM)TEXT("Schlick-GGX"));
+		SendMessage(specularG, CB_INSERTSTRING, 7, (LPARAM)TEXT("UE中的Schlick"));
+		SendMessage(specularG, CB_INSERTSTRING, 8, (LPARAM)TEXT("Beckmann")); 
+		SendMessage(specularG, CB_INSERTSTRING, 9, (LPARAM)TEXT("GGX"));
+		SendMessage(specularG, CB_INSERTSTRING, 10, (LPARAM)TEXT("SmithJointGGX"));
+		SendMessage(specularG, CB_INSERTSTRING, 11, (LPARAM)TEXT("SmithJointGG优化版"));
 		SendMessage(specularG, CB_SETCURSEL, 0, 0);
 
 		//设置漫反射率的slider
@@ -338,6 +336,13 @@ INT_PTR CALLBACK About0(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(GetDlgItem(hDlg, IDC_DGTRN), TBM_SETPOS, TRUE, 0);
 
 		//静态文本
+		CreateWindow(TEXT("STATIC"), TEXT("D:"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			10, 10, 15, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("F:"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			160, 10, 15, 15, hDlg, nullptr, hinst, NULL);
+		CreateWindow(TEXT("STATIC"), TEXT("G:"), WS_CHILD | WS_VISIBLE | SS_LEFT,
+			310, 10, 15, 15, hDlg, nullptr, hinst, NULL);
+
 		HWND hwnd_di = CreateWindow(TEXT("STATIC"), TEXT("diffuse强度"), WS_CHILD | WS_VISIBLE | SS_LEFT, 
 			10, 40, 85, 15, hDlg, (HMENU)IDC_DIFFUSEINTENSITY, hinst, NULL);
 		SendMessage(hwnd_di, WM_SETFONT, (WPARAM)GetStockObject(17), 0);
